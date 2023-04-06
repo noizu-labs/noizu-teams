@@ -16,7 +16,9 @@ defmodule NoizuTeamsWeb.Router do
 
   scope "/", NoizuTeamsWeb do
     pipe_through :browser
-
+    live "/chat", ChatLive
+    live "/agents", AgentsLive
+    live "/agent/:id", AgentLive
     get "/", PageController, :home
   end
 

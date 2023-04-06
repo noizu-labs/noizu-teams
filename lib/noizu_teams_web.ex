@@ -52,7 +52,7 @@ defmodule NoizuTeamsWeb do
   def live_view do
     quote do
       use Phoenix.LiveView,
-        layout: {NoizuTeamsWeb.Layouts, :app}
+        layout: {NoizuTeamsWeb.Layouts, :live_view}
 
       unquote(html_helpers())
     end
