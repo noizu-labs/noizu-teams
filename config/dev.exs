@@ -1,5 +1,11 @@
 import Config
 
+
+require NoizuTeams.Config.ConfigUtils
+
+config :noizu_teams,
+       openai_api_key: NoizuTeams.Config.ConfigUtils.env_setting("OPENAI_API_KEY")
+
 # Configure your database
 config :noizu_teams, NoizuTeams.Repo,
   username: "postgres",

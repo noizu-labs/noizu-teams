@@ -6,6 +6,8 @@
 
 # General application configuration
 import Config
+import_config "utils/environment.exs"
+
 
 config :noizu_teams,
   ecto_repos: [NoizuTeams.Repo]

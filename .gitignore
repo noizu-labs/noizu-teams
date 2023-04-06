@@ -1,3 +1,6 @@
+# Environment
+.envrc
+
 # Intellij
 noizu_teams.iml
 .idea/
