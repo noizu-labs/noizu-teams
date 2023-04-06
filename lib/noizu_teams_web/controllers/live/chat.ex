@@ -16,7 +16,7 @@ defmodule NoizuTeamsWeb.ChatLive do
       </div>
       <div class="bg-white rounded-lg shadow p-4 mb-4">
         <form phx-submit="send" class="flex">
-          <input type="text" name="message" class="flex-1 border border-gray-300 rounded-l py-2 px-3 mr-2" />
+          <textarea rows="20" name="message" class="flex-1 border border-gray-300 rounded-l py-2 px-3 mr-2" />
           <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-r">Send</button>
         </form>
       </div>
@@ -28,8 +28,8 @@ defmodule NoizuTeamsWeb.ChatLive do
     ~H"""
     <div>
       <div class="author"><b><%= @author %></b>:</div>
-      <div class="content">
-        <%=  raw(Earmark.as_html!(@content)) %>
+      <div class="content markdown-body">
+        <%=  raw(Earmark.as_html!(@content, code_class_prefix: "Apple")) %>
       </div>
     </div>
     """

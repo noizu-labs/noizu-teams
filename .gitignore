@@ -5,6 +5,7 @@ noizu_teams.iml
 # The directory Mix will write compiled artifacts to.
 /_build/
 
+
 # If you run "mix test --cover", coverage assets end up here.
 /cover/
 
@@ -31,6 +32,8 @@ noizu_teams-*.tar
 
 # Ignore assets that are produced by build tools.
 /priv/static/assets/
+
+/priv/static/
 
 # Ignore digested assets cache.
 /priv/static/cache_manifest.json
