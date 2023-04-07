@@ -3,7 +3,7 @@ import Config
 
 require NoizuTeams.Config.ConfigUtils
 
-config :noizu_teams,
+config :noizu_openai,
        openai_api_key: NoizuTeams.Config.ConfigUtils.env_setting("OPENAI_API_KEY")
 
 # Configure your database

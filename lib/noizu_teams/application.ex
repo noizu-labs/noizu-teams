@@ -11,11 +11,12 @@ defmodule NoizuTeams.Application do
       # Start the Telemetry supervisor
       NoizuTeamsWeb.Telemetry,
       # Start the Ecto repository
-      #NoizuTeams.Repo,
+      # NoizuTeams.Repo,
       # Start the PubSub system
       {Phoenix.PubSub, name: NoizuTeams.PubSub},
       # Start Finch
       {Finch, name: NoizuTeams.Finch},
+      {Finch, name: NoizuLabs.OpenAI.Finch},
       # Start the Endpoint (http/https)
       NoizuTeamsWeb.Endpoint
       # Start a worker by calling: NoizuTeams.Worker.start_link(arg)

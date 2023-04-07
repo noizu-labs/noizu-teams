@@ -45,25 +45,14 @@ defmodule NoizuTeamsWeb.ChatLive do
   end
 
   def handle_event("send", %{"message" => message}, socket) do
-    # Replace this with your code to send the message to your backend
-
-    # curl https://api.openai.com/v1/chat/completions \
-    #  -H "Content-Type: application/json" \
-    #  -H "Authorization: Bearer $OPENAI_API_KEY" \
-    #  -d '{
-    #    "model": "gpt-3.5-turbo",
-    #    "messages": [{"role": "user", "content": "Hello!"}]
-    #  }'
-
-    # Todo logic for forwarding to the correct model / tracking chat history per model.
     messages = [
       %{role: "system", content: @grace_prompt},
       %{role: "user", content: message}
     ]
-    with {:ok, response} <- NoizuLabs.OpenAI.chat(messages) |> IO.inspect(label: :repsonse) do
+    with {:ok, response} <- NoizuLabs.OpenAI.chat(messages) |> IO.inspect(label: "API Response") do
       msg = %{author: "Grace", content: get_in(response, [:choices, Access.at(0), :message, :content])}
       messages = socket.assigns.messages ++ [%{author: "Keith", content: message}, msg]
-      |> IO.inspect(label: :messages)
+                 |> IO.inspect(label: :messages)
       socket = socket
                |> assign(messages:  messages)
       {:noreply, socket}
