@@ -51,6 +51,8 @@ defmodule NoizuTeams.MixProject do
       {:gettext, "~> 0.20"},
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
+      {:websockex, "~> 0.4.3"},
+      {:websocket_client, "~> 1.4"},
       {:noizu_openai, path: "elixir-framework/libs/elixir-openai"}
     ]
   end
