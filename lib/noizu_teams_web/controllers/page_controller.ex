@@ -4,6 +4,12 @@ defmodule NoizuTeamsWeb.PageController do
   def home(conn, _params) do
     # The home page is often custom made,
     # so skip the default app layout.
-    render(conn, :home, layout: false)
+    render(conn, :login, layout: false)
+  end
+
+  def terms(conn, _params) do
+    # The home page is often custom made,
+    # so skip the default app layout.
+    render(conn, :terms, layout: false)
   end
 end
