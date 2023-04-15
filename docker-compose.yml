@@ -1,0 +1,37 @@
+version: '3.9'
+networks:
+  noizu-teams-net:
+services:
+  terminal:
+    container_name: noizu-teams-terminal
+    hostname: noizu-teams-terminal 
+    image: "terminal-service"
+    ports:
+      - 127.0.0.1:6500:8000
+      - 127.0.0.1:6600:4000
+    networks:
+      - noizu-teams-net
+  redis:
+    container_name: noizu-teams-redis
+    hostname: noizu-teams-redis
+    image: "redis:alpine"
+    logging:
+      driver: "none"
+    ports:
+      - 127.0.0.1:6501:6379
+    networks:
+      - noizu-teams-net
+  database:
+    container_name: noizu-teams-db
+    hostname: noizu-teams-pg
+    image: "timescale/timescaledb-ha:pg15-latest"
+    logging:
+      driver: "none"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: noizu_teams
+    ports:
+      - 127.0.0.1:6502:5432
+    networks:
+      - noizu-teams-net

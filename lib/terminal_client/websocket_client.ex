@@ -1,14 +1,27 @@
-defmodule NoizuTeams.TerminalClient.WebsocketClient do
+defmodule NoizuTeams.TerminalClient do
   use WebSockex
   require Logger
 
-  def start_link(url) do
-    WebSockex.start_link(url, __MODULE__, nil)
+  def start_link(config) do
+    state = %{response: nil}
+    name = config[:name] || __MODULE__
+    WebSockex.start_link(config[:url], __MODULE__, state, name: __MODULE__)
   end
 
-  def send_command(client, command) do
+  def send_command(process \\ __MODULE__, command) do
     Logger.info("Sending command: #{command}")
-    WebSockex.send_frame(client, {:text, command})
+    WebSockex.send_frame(process, {:text, command})
+  end
+
+  def flush(process \\ __MODULE__) do
+    GenServer.call(process, :flush)
+  end
+
+  def handle_info({:"$gen_call", _, :flush}, state) do
+    IO.puts "FLUSH? | #{inspect state}"
+    response = state.response
+    state = %{state| response: nil}
+    {:reply, response, state}
   end
 
   def handle_connect(_conn, state) do
@@ -16,8 +29,9 @@ defmodule NoizuTeams.TerminalClient.WebsocketClient do
     {:ok, state}
   end
 
-  def handle_frame({:text, response}, state) do
-    Logger.info("Received response: #{response}")
+  def handle_frame(frame = {:text, response}, state) do
+    Logger.info("Received response: #{inspect response, limit: :infinity}")
+    state = %{state| response: frame}
     {:ok, state}
   end
 
