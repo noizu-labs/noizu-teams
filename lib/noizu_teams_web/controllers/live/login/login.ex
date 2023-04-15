@@ -6,7 +6,7 @@ defmodule NoizuTeamsWeb.LoginForm.Login do
     <div class="flex items-center justify-center">
     <div class="bg-white rounded-lg shadow-lg w-4/5 p-6 md:p-8 ">
     <h2 class="text-2xl font-bold mb-4">Log in to your account</h2>
-    <form>
+    <form phx-submit="submit:login">
       <div class="mb-4 items-center">
         <label for="email" class="block text-gray-700 font-bold mb-2">Email Address</label>
         <input type="email" id="email" name="email" class="border rounded-lg w-full py-2 px-3" placeholder="Enter your email address" required>

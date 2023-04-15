@@ -21,6 +21,7 @@ defmodule NoizuTeamsWeb.Router do
     live "/agent/:id", AgentLive
     get "/", PageController, :home
     get "/terms-and-conditions", PageController, :terms
+    get "/jwt", PageController, :jwt
   end
 
   # Other scopes may use custom stacks.

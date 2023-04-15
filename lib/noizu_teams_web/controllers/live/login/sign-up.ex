@@ -6,7 +6,7 @@ defmodule NoizuTeamsWeb.LoginForm.SignUp do
     <div class="flex justify-center items-center">
     <div class="bg-white rounded-lg shadow-lg w-4/5 p-6 md:p-8 ">
     <h2 class="text-2xl font-bold mb-4">Sign Up</h2>
-    <form>
+    <form phx-submit="submit:sign-up" >
       <div class="mb-4">
         <label for="name" class="block text-gray-700 font-bold mb-2">Name</label>
         <input type="text" id="name" name="name" class="border rounded-lg py-2 px-3 w-full" placeholder="Enter your name" required>

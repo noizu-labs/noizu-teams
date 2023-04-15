@@ -17,6 +17,6 @@ defmodule NoizuTeams.User.Credential.Password do
   def changeset(password, attrs) do
     password
     |> cast(attrs, [:user_id, :password, :enabled, :created_on, :modified_on, :deleted_on])
-    |> validate_required([:user_id, :password, :enabled, :created_on, :modified_on, :deleted_on])
+    |> validate_required([:user_id, :password, :enabled, :created_on, :modified_on])
   end
 end

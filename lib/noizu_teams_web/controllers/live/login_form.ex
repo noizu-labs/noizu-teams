@@ -22,6 +22,41 @@ defmodule NoizuTeamsWeb.LoginForm do
     {:noreply, socket}
   end
 
+
+  def handle_event("submit:login", form, socket) do
+    case NoizuTeams.User.login(form["email"], form["password"]) do
+      {:ok, user} ->
+        # Handle successful sign-up
+        # Generate JWT token
+        with {:ok, jwt_token} <- NoizuTeams.User.generate_jwt(user) do
+          # Send auth event with JWT token
+          IO.inspect socket
+          socket = push_event(socket, "auth", %{jwt: jwt_token})
+          {:noreply, socket}
+        else
+          _ ->
+            {:noreply, socket}
+        end
+
+      {:error, error_msg} ->
+        # Handle sign-up failure
+        IO.inspect error_msg, label: "Login Error"
+        {:noreply, socket}
+    end
+  end
+
+  def handle_event("submit:sign-up", form, socket) do
+    case NoizuTeams.User.sign_up(form) do
+      {:ok, user} ->
+        # Handle successful sign-up
+        IO.inspect user, label: "New User"
+      {:error, error_msg} ->
+        # Handle sign-up failure
+        IO.inspect error_msg, label: "Sign-Up Error"
+    end
+    {:noreply, socket}
+  end
+
   def mount(_params, _session, socket) do
     socket = socket
              |> assign(mode: :login)

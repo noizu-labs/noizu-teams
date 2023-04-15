@@ -2,31 +2,29 @@ defmodule NoizuTeams.Enum do
   defmacro __using__(values) do
     quote do
       @values unquote(values)
+      @value_strings Enum.map(@values, &(Atom.to_string(&1)))
       use Ecto.Type
 
-      IO.puts "HERE 1"
       def from_string(value) when is_binary(value) do
         case value do
-          v when v in @values -> {:ok, String.to_existing_atom(value)}
+          v when v in @value_strings -> {:ok, String.to_existing_atom(value)}
           _ -> {:error, "invalid value"}
         end
       end
 
-      IO.puts "HERE 2"
       def from_atom(value) when is_atom(value) do
         if Enum.member?(@values, value) do
-          value
+          {:ok, value}
         else
-          {:error, "invalid value"}
+          {:error, :invalid_value}
         end
       end
 
-      IO.puts "HERE 3"
-      def type, do: :enum
+      def type, do: Ecto.Enum
 
-      IO.puts "HERE 4"
-      def cast(value) do
-        case from_string(value) |> IO.inspect(label: "fs") do
+      def cast(value) when is_bitstring(value) do
+        IO.puts "CAST: #{inspect value}"
+        case from_string(value) do
           {:ok, result} -> {:ok, result}
           {:error, _} -> :error
           error ->
@@ -35,11 +33,41 @@ defmodule NoizuTeams.Enum do
         end
       end
 
-      IO.puts "HERE 5"
-      def dump(value) do
+      def cast(value) when is_atom(value) do
+        IO.puts "CAST: #{inspect value}"
+
         case from_atom(value) do
-          :error -> :error
-          value -> {:ok, Atom.to_string(value)}
+          {:ok, result} -> {:ok, result}
+          {:error, error} ->
+            IO.inspect(error, label: "Error")
+            :error
+          error ->
+            IO.inspect(error, label: "Error")
+            :error
+        end
+      end
+
+      def load(value) do
+        cast(value)
+      end
+
+      def dump(value) when is_bitstring(value) do
+        IO.puts "DUMP: #{inspect value}"
+        case from_string(value) do
+          {:ok, result} -> {:ok, Atom.to_string(result)}
+          error ->
+            IO.inspect(error, label: "Error")
+            error
+        end
+      end
+
+      def dump(value) when is_atom(value) do
+        IO.puts "DUMP: #{inspect value}"
+        case from_atom(value) do
+          {:ok, result} -> {:ok, Atom.to_string(result)}
+          error ->
+            IO.inspect(error, label: "Error")
+            error
         end
       end
     end

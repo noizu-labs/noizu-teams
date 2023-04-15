@@ -7,3 +7,15 @@
     </div>
 
 </div>
+
+<script>
+
+    window.addEventListener("load", (event) => {
+        window.addEventListener(`phx:auth`, (e) => {
+            console.log(e);
+            window.location = "/jwt?jwt=" + e.detail['jwt'];
+        })
+    });
+
+
+</script>
