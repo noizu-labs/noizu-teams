@@ -11,7 +11,7 @@ defmodule NoizuTeams.Application do
       # Start the Telemetry supervisor
       NoizuTeamsWeb.Telemetry,
       # Start the Ecto repository
-      # NoizuTeams.Repo,
+      NoizuTeams.Repo,
       # Start the PubSub system
       {Phoenix.PubSub, name: NoizuTeams.PubSub},
       # Start Finch

@@ -10,11 +10,13 @@ config :noizu_openai,
 config :noizu_teams, NoizuTeams.Repo,
   username: "postgres",
   password: "postgres",
-  hostname: "localhost",
-  database: "noizu_teams_dev",
+  port: 6502,
+  hostname: "127.0.0.1",
+  database: "noizu_teams",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
-  pool_size: 10
+  pool_size: 10,
+  primary_key: {:identifier, :uuid, autogenerate: true}
 
 # For development, we disable any cache and enable
 # debugging and code reloading.
