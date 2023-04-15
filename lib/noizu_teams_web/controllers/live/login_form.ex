@@ -28,10 +28,10 @@ defmodule NoizuTeamsWeb.LoginForm do
       {:ok, user} ->
         # Handle successful sign-up
         # Generate JWT token
-        with {:ok, jwt_token} <- NoizuTeams.User.generate_jwt(user) do
+        with {:ok, jwt_token} <- NoizuTeams.User.indirect_auth(user) do
           # Send auth event with JWT token
           IO.inspect socket
-          socket = push_event(socket, "auth", %{jwt: jwt_token})
+          socket = push_event(socket, "auth", %{jwt: jwt_token, remember_me: form["remember_me"] == "on"})
           {:noreply, socket}
         else
           _ ->
@@ -57,9 +57,12 @@ defmodule NoizuTeamsWeb.LoginForm do
     {:noreply, socket}
   end
 
-  def mount(_params, _session, socket) do
+  def mount(_params, session, socket) do
     socket = socket
              |> assign(mode: :login)
+             |> assign(csrf: session["_csrf_token"])
+
+
     {:ok, socket}
   end
 end

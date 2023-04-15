@@ -15,7 +15,7 @@ defmodule NoizuTeamsWeb.AgentLive do
     """
   end
 
-  def mount(m, session, socket) do
+  def mount(_m, _session, socket) do
     agent = fetch_agent(socket.id)
     {:ok, assign(socket, agent: agent)}
   end

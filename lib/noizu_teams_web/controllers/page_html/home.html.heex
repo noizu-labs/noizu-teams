@@ -1,22 +1,24 @@
+
 <div class="flex">
 
-    <div class="w-1/4 p-4">
+    <div class="w-1/6 p-4">
       <!-- Left Section - Agents listing -->
       <h2 class="text-lg font-bold mb-4">Agents</h2>
       <%= live_render(@conn, NoizuTeamsWeb.AgentsLive) %>
     </div>
 
 
-  <div class="w-4/5 p-4">
+  <div class="w-4/6 p-4">
     <%= live_render(@conn, NoizuTeamsWeb.ChatLive) %>
   </div>
 
 
-  <div class="w-1/4 p-4">
+  <div class="w-1/6 p-4">
     <!-- Right Section - Configuration -->
     <h2 class="text-lg font-bold mb-4">Configuration</h2>
     <div class="bg-white rounded-lg shadow p-4 mb-4">
       <!-- Placeholder card with details -->
     </div>
   </div>
+
 </div>

@@ -5,7 +5,7 @@ defmodule NoizuTeams.TerminalClient do
   def start_link(config) do
     state = %{response: nil}
     name = config[:name] || __MODULE__
-    WebSockex.start_link(config[:url], __MODULE__, state, name: __MODULE__)
+    WebSockex.start_link(config[:url], __MODULE__, state, name: name)
   end
 
   def send_command(process \\ __MODULE__, command) do

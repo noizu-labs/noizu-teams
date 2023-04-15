@@ -28,14 +28,13 @@ defmodule NoizuTeams.User do
   end
 
 
-  def generate_jwt(user) do
-    {:ok, jwt, _} = NoizuTeamsWeb.Guardian.encode_and_sign(user)
+  def indirect_auth(user) do
+    {:ok, jwt, _} = NoizuTeamsWeb.Guardian.encode_and_sign(user, %{"login-only" => true}, ttl: {1, :minute})
     {:ok, jwt}
   end
 
   def login(email, password) do
     user = Repo.get_by(User, email: String.downcase(email)) || Repo.get_by(User, login_name: String.downcase(email))
-    password_hash = Bcrypt.hash_pwd_salt(password) |> IO.inspect(label: "HASH")
     case user do
       nil ->
         {:error, :user_not_found}

@@ -11,6 +11,9 @@ import_config "utils/environment.exs"
 config :noizu_teams, NoizuTeamsWeb.Guardian,
        issuer: "noizu_teams",
        secret_key: "lIf077euUjrkZiNKBnprpmkogsWDIrDWJZ7UakAOhNsRgje+ko7Xmk5uJbKFGdNv"
+config :noizu_teams, NoizuTeamsWeb.Guardian.AuthPipeline,
+       module: NoizuTeamsWeb.Guardian,
+       error_handler: NoizuTeamsWeb.Guardian.AuthErrorHandler
 
 config :noizu_teams,
   ecto_repos: [NoizuTeams.Repo]

@@ -6,14 +6,12 @@ defmodule NoizuTeamsWeb.ChatLive do
   """
 
   def render(assigns) do
-    messages = assigns[:messages]
-
     ~H"""
     <div class="h-full flex flex-col">
       <div class="bg-white rounded-lg shadow p-4 flex-1 mb-4 overflow-y-auto">
         <h2 class="text-lg font-bold mb-4">Chat</h2>
 
-        <%= for message <- messages do %>
+        <%= for message <- @messages do %>
           <%= render_message(message) %>
         <% end %>
 

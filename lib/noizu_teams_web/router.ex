@@ -10,6 +10,10 @@ defmodule NoizuTeamsWeb.Router do
     plug :put_secure_browser_headers
   end
 
+  pipeline :secure_browser do
+    plug NoizuTeamsWeb.Guardian.AuthPipeline
+  end
+
   pipeline :api do
     plug :accepts, ["json"]
   end
@@ -19,9 +23,13 @@ defmodule NoizuTeamsWeb.Router do
     live "/chat", ChatLive
     live "/agents", AgentsLive
     live "/agent/:id", AgentLive
-    get "/", PageController, :home
     get "/terms-and-conditions", PageController, :terms
-    get "/jwt", PageController, :jwt
+    get "/logout", PageController, :logout
+    post "/login", PageController, :login
+    get "/login", PageController, :login
+
+    pipe_through :secure_browser
+    get "/", PageController, :home
   end
 
   # Other scopes may use custom stacks.
