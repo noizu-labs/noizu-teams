@@ -5,6 +5,7 @@ defmodule NoizuTeams.User do
   alias NoizuTeams.User
   alias NoizuTeams.Repo
 
+  @derive NoizuLabs.EntityReference.Protocol
   @primary_key {:identifier, :binary_id, autogenerate: true}
   schema "users" do
     field :name, :string
@@ -33,6 +34,19 @@ defmodule NoizuTeams.User do
     {:ok, jwt}
   end
 
+  def ref(%__MODULE__{identifier: identifier}) do
+    {:ok, {:ref, __MODULE__, identifier}}
+  end
+
+
+  def id(%__MODULE__{identifier: identifier}) do
+    {:ok, identifier}
+  end
+  def id({:ref, __MODULE__, identifier}) do
+    {:ok, identifier}
+  end
+
+
   def login(email, password) do
     user = Repo.get_by(User, email: String.downcase(email)) || Repo.get_by(User, login_name: String.downcase(email))
     case user do
@@ -53,7 +67,19 @@ defmodule NoizuTeams.User do
   end
 
 
-  def sign_up(attrs) do
+  def join_project(user, nil), do: nil
+  def join_project(user, {:subdomain, subdomain}) do
+    with %NoizuTeams.Project{} = project <- NoizuTeams.Repo.get_by(NoizuTeams.Project, subdomain: subdomain) do
+      Repo.insert(%NoizuTeams.Project.Member{
+        project_id: project.identifier,
+        user_id: user.identifier,
+        role: :pending,
+        joined_on: DateTime.utc_now(),
+      })
+    end
+  end
+
+  def sign_up(attrs, project \\ nil) do
     email = attrs["email"]
     password = attrs["password"]
     name = attrs["name"]
@@ -79,6 +105,10 @@ defmodule NoizuTeams.User do
                created_on: DateTime.utc_now(),
                modified_on: DateTime.utc_now()
              }) do
+
+          # Attempt to assign to project
+          join_project(user, project)
+
           {:ok, user}
         else
           error ->

@@ -53,10 +53,12 @@ defmodule NoizuTeams.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:websockex, "~> 0.4.3"},
       {:websocket_client, "~> 1.4"},
-       {:bcrypt_elixir, "~> 2.0"},
+      {:bcrypt_elixir, "~> 2.0"},
+      {:elixir_uuid, "~> 1.2" },
       {:ueberauth, "~> 0.10.5"},
       {:guardian, "~> 2.3.1"},
-      {:noizu_openai, path: "elixir-framework/libs/elixir-openai"}
+      {:noizu_openai, path: "elixir-framework/libs/elixir-openai"},
+      {:noizu_labs_erp, path: "elixir-framework/libs/noizu_labs_erp"},
     ]
   end
 

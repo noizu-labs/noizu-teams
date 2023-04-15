@@ -1,17 +1,66 @@
 defmodule NoizuTeamsWeb.PageController do
   use NoizuTeamsWeb, :controller
+  import NoizuLabs.EntityReference.Helpers
   require Logger
-  def home(conn, _params) do
+
+  defp project(conn, params) do
+    case String.split(conn.host, ".") do
+      ["dev", "teams", "noizu", "com"] -> {:subdomain, "noizu"}
+      ["dev", p, "teams", "noizu", "com"] -> {:subdomain, p}
+      ["teams", "noizu", "com"] -> {:subdomain, "noizu"}
+      [p, "teams", "noizu", "com"] -> {:subdomain, p}
+      _ -> nil
+    end
+  end
+
+  def home(conn, params) do
     with %NoizuTeams.User{} = user <- NoizuTeamsWeb.Guardian.Plug.current_resource(conn) do
-      conn
-      |> render(:home,
-           %{
-             active_user: user,
-           }
-      )
+      # Verify user has access to current project
+
+      with id = {:subdomain, slug} <- project(conn, params),
+           {:ok, project} <- NoizuTeams.Project.entity(id),
+           {:ok, project_membership} = NoizuTeams.Project.membership(project, user),
+           true <- project_membership.role not in [:deactivated, :pending],
+           {:ok, team} <- NoizuTeams.Project.default_team(project, user),
+           true <- (project_membership.role in [:owner, :admin]) or (team.membership and team.membership.role not in [:deactivated, :pending])
+        do
+
+        team_selector = %{
+          "user" => ERP.ref(user) |> ok?,
+          "project" => ERP.ref(project) |> ok?,
+          "project_role" => project_membership.role,
+          "team" => ERP.ref(team) |> ok?,
+          "team_role" => get_in(team, [Access.key(:membership), Access.key(:role, :none)])
+        }
+
+        conn
+        |> render(:home,
+             %{
+               team_selector: team_selector,
+               active_user: user,
+               active_project: %{project | membership: project_membership},
+               active_team: team,
+             }
+           )
+      else
+        _ ->
+          conn
+          |> render(:request_access,
+               %{
+                 active_user: user,
+                 active_project: nil,
+                 active_team: nil,
+                 active_role: nil,
+               }
+             )
+      end
+
+
     else
       e ->
-        render(conn, :login, layout: false)
+        # temp hardcode
+        project_slug = project(conn, params)
+        render(conn, :login, project: project_slug, layout: false)
     end
   end
 
@@ -41,8 +90,9 @@ defmodule NoizuTeamsWeb.PageController do
         |> json(%{auth: false})
     end
   end
-  def login(conn, _) do
-    render(conn, :login, layout: false)
+  def login(conn, params) do
+    project_slug = project(conn, params)
+    render(conn, :login, project: project_slug, layout: false)
   end
 
   def terms(conn, _params) do

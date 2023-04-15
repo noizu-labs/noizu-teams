@@ -2,9 +2,18 @@
 <div class="flex">
 
     <div class="w-1/6 p-4">
-      <!-- Left Section - Agents listing -->
-      <h2 class="text-lg font-bold mb-4">Agents</h2>
-      <%= live_render(@conn, NoizuTeamsWeb.AgentsLive) %>
+      <%= live_render(
+      @conn,
+      NoizuTeamsWeb.Project.TeamSelector,
+      id: "team-selector",
+      session: @team_selector
+      ) %>
+      <%= live_render(
+        @conn,
+        NoizuTeamsWeb.Project.TeamMembers,
+        id: "team-members",
+        session: %{"team" => @active_team, "project" => @active_project}
+      ) %>
     </div>
 
 

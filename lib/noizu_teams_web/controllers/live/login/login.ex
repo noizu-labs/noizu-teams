@@ -1,11 +1,21 @@
 defmodule NoizuTeamsWeb.LoginForm.Login do
   use NoizuTeamsWeb, :live_component
+  import NoizuTeamsWeb.Nav.Tags
+
+  defp error_title(error), do: "Login"
+  defp error_body(error) do
+    IO.inspect error, label: "ERROR TUPLE"
+    "An error has Occurred"
+  end
 
   def render(assigns) do
     ~H"""
     <div class="flex items-center justify-center">
     <div class="bg-white rounded-lg shadow-lg w-4/5 p-6 md:p-8 ">
     <h2 class="text-2xl font-bold mb-4">Log in to your account</h2>
+    <%= if @error do %>
+      <.noizu_alert error-title={ error_title(@error) } error-body={error_body(@error)} />
+    <% end %>
     <form phx-submit="submit:login">
       <div class="mb-4 items-center">
         <label for="email" class="block text-gray-700 font-bold mb-2">Email Address</label>

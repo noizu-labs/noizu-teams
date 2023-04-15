@@ -8,6 +8,9 @@ defmodule NoizuTeams.Repo.Migrations.CreateTeamMembers do
       add :team_id, :uuid, null: false
       add :role, :team_role_enum, null: false
 
+      add :position, :string
+      add :blurb, :string
+
       add :joined_on, :utc_datetime_usec, null: false
       add :removed_on, :utc_datetime_usec
     end

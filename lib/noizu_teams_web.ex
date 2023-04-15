@@ -41,7 +41,7 @@ defmodule NoizuTeamsWeb do
       use Phoenix.Controller,
         formats: [:html, :json],
         layouts: [html: NoizuTeamsWeb.Layouts]
-
+      use NoizuLabs.EntityReference
       import Plug.Conn
       import NoizuTeamsWeb.Gettext
 
@@ -53,6 +53,7 @@ defmodule NoizuTeamsWeb do
     quote do
       use Phoenix.LiveView,
         layout: {NoizuTeamsWeb.Layouts, :live_view}
+      use NoizuLabs.EntityReference
 
       unquote(html_helpers())
     end
@@ -61,6 +62,7 @@ defmodule NoizuTeamsWeb do
   def live_component do
     quote do
       use Phoenix.LiveComponent
+      use NoizuLabs.EntityReference
 
       unquote(html_helpers())
     end

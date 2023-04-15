@@ -13,7 +13,8 @@ defmodule NoizuTeams.Application do
       # Start the Ecto repository
       NoizuTeams.Repo,
       # Start the PubSub system
-      {Phoenix.PubSub, name: NoizuTeams.PubSub},
+      Supervisor.child_spec({Phoenix.PubSub, name: NoizuTeams.PubSub}, id: :pubsub_standard),
+      Supervisor.child_spec({Phoenix.PubSub, name: NoizuTeams.LiveView.Interop}, id: :pubsub_interop),
       # Start Finch
       {Finch, name: NoizuTeams.Finch},
       {Finch, name: NoizuLabs.OpenAI.Finch},

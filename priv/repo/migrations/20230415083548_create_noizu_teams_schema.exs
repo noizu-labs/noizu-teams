@@ -4,8 +4,8 @@ defmodule NoizuTeams.Repo.Migrations.CreateNoizuTeamsSchema do
 
   def up do
     execute("CREATE EXTENSION IF NOT EXISTS citext")
-    execute("CREATE TYPE account_status_enum AS ENUM ('deleted', 'locked', 'enabled', 'deactivated')")
-    execute("CREATE TYPE team_role_enum AS ENUM ('owner', 'admin', 'member', 'limited', 'deactivated')")
+    execute("CREATE TYPE account_status_enum AS ENUM ('deleted', 'locked', 'enabled', 'deactivated', 'pending')")
+    execute("CREATE TYPE team_role_enum AS ENUM ('owner', 'admin', 'member', 'limited', 'deactivated', 'pending')")
     execute("CREATE TYPE client_type_enum AS ENUM ('ios', 'android', 'web', 'app')")
   end
 

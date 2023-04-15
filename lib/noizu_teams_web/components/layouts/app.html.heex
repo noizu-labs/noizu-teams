@@ -1,13 +1,20 @@
+<%= if assigns[:active_user] do %>
 <.navbar active-user={assigns[:active_user]} >
   <:logo>
     <.link navigate={"/"} class="flex w-1/6 items-center">
       <.logo />
     </.link>
   </:logo>
-  <:link label="Teams" to={"/teams"} />
-  <:link label="Projects" to={"/projects"} />
-  <:link label="Agents" to={"/agents"} />
 </.navbar>
+<%= else %>
+<.navbar active-user={assigns[:active_user]} >
+<:logo>
+  <.link navigate={"/"} class="flex w-1/6 items-center">
+  <.logo />
+</.link>
+</:logo>
+</.navbar>
+<% end %>
 
 <main class="">
   <div class="w-ful;">

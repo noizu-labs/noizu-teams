@@ -14,4 +14,17 @@
   <body class="bg-white antialiased">
     <%= @inner_content %>
   </body>
+
+
+  <script>
+
+    window.addEventListener("load", (event) => {
+      window.addEventListener(`phx:team:change`, (e) => {
+        console.log(e)
+      });
+
+
+    });
+  </script>
+
 </html>

@@ -5,10 +5,8 @@ defmodule NoizuTeams.Repo.Migrations.CreateTeamAgents do
     create table(:team_agents, primary_key: false) do
       add :identifier, :uuid, primary_key: true
       add :team_id, :uuid, null: false
-
-      add :name, :string, null: false
-      add :description, :string, null: false
-      add :prompt, :string, null: false
+      add :project_agent_id, :uuid, null: false
+      add :team_prompt, :string, null: false
 
       add :status, :account_status_enum, null: false
 

@@ -5,10 +5,8 @@ defmodule NoizuTeams.Team.Agent do
   @primary_key {:identifier, :binary_id, autogenerate: true}
   schema "team_agents" do
     field :team_id, Ecto.UUID
-
-    field :name, :string
-    field :description, :string
-    field :prompt, :string
+    field :project_agent_id, Ecto.UUID
+    field :team_prompt, :string
 
     field :status, NoizuTeams.AccountStatusEnum
 
@@ -20,7 +18,7 @@ defmodule NoizuTeams.Team.Agent do
   @doc false
   def changeset(team_agent, attrs) do
     team_agent
-    |> cast(attrs, [:team_id, :name, :description, :prompt, :status, :created_on, :modified_on, :deleted_on])
-    |> validate_required([:team_id, :name, :description, :prompt, :status, :created_on, :modified_on, :deleted_on])
+    |> cast(attrs, [:team_id, :project_agent_id, :team_prompt, :status, :created_on, :modified_on, :deleted_on])
+    |> validate_required([:team_id, :project_agent_id, :team_prompt, :status, :created_on, :modified_on, :deleted_on])
   end
 end

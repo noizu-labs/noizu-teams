@@ -2,7 +2,12 @@
 
     <div class="p-4 align-center w-2/5">
         <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-            <%= live_render(@conn, NoizuTeamsWeb.LoginForm, container: {:div, [class: "w-full"]}) %>
+            <%= live_render(
+            @conn,
+            NoizuTeamsWeb.LoginForm,
+            container: {:div, [class: "w-full"]},
+            session: %{"project" =>  assigns[:project]}
+            ) %>
         </div>
     </div>
 
