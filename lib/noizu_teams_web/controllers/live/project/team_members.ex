@@ -1,15 +1,15 @@
 defmodule NoizuTeamsWeb.Project.TeamMembers do
   use NoizuTeamsWeb, :live_view
-  import Phoenix.LiveView.JS
-  import NoizuTeamsWeb.Nav.Tags
+  #import Phoenix.LiveView.JS
+  #import NoizuTeamsWeb.Nav.Tags
   import NoizuTeamsWeb.Project.Tags
   import NoizuLabs.EntityReference.Helpers
-  alias Phoenix.PubSub
+  #alias Phoenix.PubSub
   require Logger
   require NoizuTeamsWeb.LiveMessage
 
-  defp error_title(error), do: "Team Member"
-  defp error_body(error) do
+  defp error_title(_error), do: "Team Member"
+  defp error_body(_error) do
     "An error has Occurred"
   end
 
@@ -26,8 +26,35 @@ defmodule NoizuTeamsWeb.Project.TeamMembers do
     """
   end
 
-  def handle_event("team1234", form_data, socket) do
-    {:noreply, assign(socket, form_data: form_data)}
+
+
+  def agent_edit_modal(modal_key, socket, agent) do
+    agent_session = %{
+      "agent_id" =>  ERP.ref(agent) |> ok?
+    }
+    payload = %NoizuTeamsWeb.Nav.Modal.Definition{
+      mask: :required,
+      enabled: true,
+      identifier: modal_key,
+      title: "Edit Agent: #{agent.name}",
+      widget: {NoizuTeamsWeb.AgentLive, modal_key, agent_session},
+      theme: nil,
+      size: :lg,
+      position: %{top: "top-[10%]", left: "left-[20%]" }, # would be nice if we could grab out position
+    }
+    NoizuTeamsWeb.LiveMessage.publish(
+      NoizuTeamsWeb.LiveMessage.live_pub(subject: :modal, instance: agent.slug, event: :launch, payload: payload)
+    )
+  end
+
+
+  def handle_event("spawn:edit:agent:modal:" <> slug, _, socket) do
+    pool = socket.assigns[:team_members]
+    with %NoizuTeams.Project.Agent{} = agent <- Enum.find(pool, &(&1.identifier == slug)) do
+      agent_edit_modal("edit-#{agent.slug}", socket, agent)
+    end
+
+    {:noreply, socket}
   end
 
 

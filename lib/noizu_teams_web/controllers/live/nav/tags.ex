@@ -1,6 +1,95 @@
 defmodule NoizuTeamsWeb.Nav.Tags do
   use NoizuTeamsWeb, :live_component
 
+
+
+  def modal_classes__mask(modal) do
+    case modal.mask do
+      :required -> ["required"]
+      :mask -> ["mask"]
+      _ -> []
+    end
+  end
+
+  def modal_classes__open(modal) do
+    if modal.enabled do
+      ["open"]
+    else
+      []
+    end
+  end
+
+  def modal_classes__theme(modal) do
+    case modal.theme do
+      :yellow -> ["modal-yellow-theme"]
+      :red -> ["modal-red-theme"]
+      :blue -> ["modal-blue-theme"]
+      :green -> ["modal-green-theme"]
+      "modal-" <> _ -> [modal.theme]
+      _ -> []
+    end
+  end
+
+  def modal_classes__size(modal) do
+    case modal.size do
+      :sm -> ["modal-sm"]
+      :md -> ["modal-md"]
+      :lg -> ["modal-lg"]
+      :xl -> ["modal-xl"]
+      "modal-" <> _ -> [modal.size]
+      _ -> []
+    end
+  end
+
+  def modal_container_classes(modal) do
+    classes = ["modal-container"] ++
+              modal_classes__open(modal) ++
+              modal_classes__mask(modal) ++
+              modal_classes__theme(modal) ++
+              modal_classes__size(modal)
+    Enum.join(classes, " ")
+  end
+
+  def modal_classes(modal) do
+    base = ["modal"]
+    top = (cond do
+             modal.position[:top] -> [modal.position[:top]]
+             :else -> []
+           end)
+    left = (cond do
+             modal.position[:left] -> [modal.position[:left]]
+             :else -> []
+           end)
+    right = (cond do
+             modal.position[:right] -> [modal.position[:right]]
+             :else -> []
+           end)
+    bottom = (cond do
+             modal.position[:bottom] -> [modal.position[:bottom]]
+             :else -> []
+           end)
+    classes = base ++ top ++ right ++ left ++ bottom
+    Enum.join(classes, " ")
+  end
+
+  attr :socket, :map, default: false
+  attr :modal, :map, default: false
+  def modal_queue_entry(assigns) do
+    ~H"""
+          <div class={ modal_container_classes(@modal) }>
+            <div class="modal-mask"></div>
+            <div class={ modal_classes(@modal) } >
+              <div class="modal-header"><%= @modal.title %></div>
+              <div class="modal-body">
+      <%= live_render(@socket, elem(@modal.widget, 0), id: elem(@modal.widget, 1), session: elem(@modal.widget, 2)) %>
+              </div>
+            </div>
+          </div>
+    """
+  end
+
+
+
   defp flash__color(:error), do: "bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
   attr :"error-title", :string, default: "An Error"
   attr :"error-body", :string, default: "Has Occurred"
@@ -47,10 +136,10 @@ defmodule NoizuTeamsWeb.Nav.Tags do
   attr :"active-user", :map, default: nil
   def navbar(assigns) do
     ~H"""
-    <nav class="bg-white w-full border-gray-200 px-2 sm:px-4 py-2.5 dark:bg-gray-900">
-      <div class=" flex flex-wrap items-center justify-between md:justify-start mx-auto">
+    <nav class="bg-white fixed w-full border-gray-200 px-2 sm:px-4 py-2.5 dark:bg-gray-900 z-nav">
+      <div class=" flex flex-wrap items-center justify-between md:justify-start mx-auto z-nac">
         <%= render_slot(@logo) %>
-        <button phx-click={toggle_dropdown(".navbar-default")} type="button" class="inline-flex items-center p-2 ml-3  mr-6 text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" aria-controls="navbar-default" aria-expanded="false">
+        <button phx-click={toggle_dropdown(".navbar-default")} type="button" class="inline-flex items-center p-2 ml-3  mr-6 text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600 z-nav" aria-controls="navbar-default" aria-expanded="false">
           <span class="sr-only">Open main menu</span>
           <svg class="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg>
         </button>

@@ -3,3 +3,265 @@
 @import "tailwindcss/utilities";
 @import "github-markdown-css/github-markdown-light.css";
 /* This file is for your main application CSS */
+
+@layer components {
+    /* Retain Spacing for sidebar to prevent flow flickers when enabled */
+    .stable-gutter {
+        scrollbar-gutter: stable;
+    }
+
+    /* Modal Queue Entry Point */
+    .modals {
+
+    }
+
+    /* Hidden unless open flag set */
+    .modals .modal-queue {
+        display: none;
+    }
+    .open.modals .modal-queue {
+        display: block;
+    }
+
+    /* Fix position queue stack at z-modal-base height */
+    .open.modals .modal-queue {
+        @apply fixed
+               left-0 top-0
+               z-modal-base
+               h-full w-full
+               overflow-y-auto overflow-x-hidden
+               outline-none
+               bg-none
+         ;
+    }
+
+    /* Define layout for global modal mask.
+     Here we define the bottom most fancy blur/tinting.
+
+     User may specify additional mask layers by adding a .required class per modal-container where it is desired.
+     */
+    .open.modals .modal-queue .modal-queue-bg-layer{
+            @apply fixed
+                    left-0 top-0
+                    z-modal-base
+                    h-full w-full
+                    overflow-y-auto overflow-x-hidden;
+    }
+    /* gaussian blur effect - blur + translucency */
+    .open.modals .modal-queue #modal-queue-bg-blur {
+        @apply backdrop-blur-sm opacity-50;
+    }
+    /* mask tint layer */
+    .open.modals .modal-queue #modal-queue-bg-tint {
+        @apply bg-slate-900 opacity-70;
+    }
+
+
+
+    /* Entering Stacked Modals. There may be 1-7 stacked modals on this system - define base layout */
+    .open.modals .modal-queue .modal-queue-floor {
+        @apply fixed
+        left-0 top-0
+        h-full w-full overflow-y-auto overflow-x-hidden
+        z-modal-container-1-0
+        flex flex-col;
+
+    }
+
+    .open.modals .modal-queue .modal-queue-floor .open.modal-container {
+        @apply fixed
+        left-[25%] top-[25%] w-5 h-5 bg-red-700;
+    }
+
+
+    /* Entering Stacked Modals. There may be 1-7 stacked modals on this system - define base layout
+    .open.modals .modal-queue .open.modal-container {
+        @apply fixed
+               left-0 top-0
+               h-full w-full overflow-y-auto overflow-x-hidden
+               flex flex-col;
+    }
+     */
+
+    /* Adjust z-index per layer - to prevent z-layer overlapping
+    .open.modals .modal-queue .open.modal-container:nth-child(1) {
+        @apply z-modal-container-1;
+    }
+    .open.modals .modal-queue .open.modal-container:nth-child(2) {
+        @apply z-modal-container-2;
+    }
+    .open.modals .modal-queue .open.modal-container:nth-child(3) {
+        @apply z-modal-container-3;
+    }
+    .open.modals .modal-queue .open.modal-container:nth-child(4) {
+        @apply z-modal-container-4;
+    }
+    .open.modals .modal-queue .open.modal-container:nth-child(5) {
+        @apply z-modal-container-5;
+    }
+    .open.modals .modal-queue .open.modal-container:nth-child(6) {
+        @apply z-modal-container-6;
+    }
+    .open.modals .modal-queue .open.modal-container:nth-child(7) {
+        @apply z-modal-container-7;
+    }
+    */
+
+
+    /* Optional Mask layer for required modals  */
+    .open.modals .modal-queue .modal-queue-floor .required.open.modal-container .modal-mask{
+        @apply fixed
+        left-0 top-0
+        /* We must inherit our z-index to correctly block lower level modals */
+        pointer-events-none
+        h-full w-full
+        overflow-y-auto overflow-x-hidden
+        opacity-70
+        bg-slate-800;
+        ;
+    }
+
+    .open.modals .modal-queue .modal-queue-floor .mask.open.modal-container .modal-mask{
+        @apply fixed
+        left-0 top-0
+            /* We must inherit our z-index to correctly block lower level modals */
+        h-full w-full
+        overflow-y-auto overflow-x-hidden
+        opacity-30
+        bg-slate-800;
+    ;
+    }
+
+
+    /* Here is our actual modal window, basic layout defined */
+    .open.modals .modal-queue .modal-queue-floor .open.modal-container .modal{
+        @apply fixed
+               m-auto h-fit
+               p-0
+               w-fit
+
+               z-modal-container-1-1
+               opacity-100
+               rounded-none
+               bg-gray-400
+               drop-shadow-lg shadow-sm shadow-gray-600
+               justify-center text-center
+               divide-y divide-stone-600 divide-solid
+         ;
+    }
+
+
+
+    /* Modal Z-indexes */
+    .open.modals .modal-queue .modal-queue-floor .open.modal-container:nth-child(1) .modal-mask{
+        @apply z-modal-container-1-0;
+    }
+    .open.modals .modal-queue .modal-queue-floor .open.modal-container:nth-child(1) .modal{
+        @apply z-modal-container-1-1;
+    }
+
+    .open.modals .modal-queue .modal-queue-floor .open.modal-container:nth-child(2) .modal-mask{
+        @apply z-modal-container-2-0;
+    }
+    .open.modals .modal-queue .modal-queue-floor .open.modal-container:nth-child(2) .modal {
+        @apply z-modal-container-2-1;
+    }
+
+    .open.modals .modal-queue .modal-queue-floor .open.modal-container:nth-child(3) .modal-mask{
+        @apply z-modal-container-3-0;
+    }
+    .open.modals .modal-queue .modal-queue-floor .open.modal-container:nth-child(3) .modal {
+        @apply z-modal-container-3-1;
+    }
+
+    .open.modals .modal-queue .modal-queue-floor .open.modal-container:nth-child(4) .modal-mask{
+        @apply z-modal-container-4-0;
+    }
+    .open.modals .modal-queue .modal-queue-floor .open.modal-container:nth-child(4) .modal {
+        @apply z-modal-container-4-1;
+    }
+
+    .open.modals .modal-queue .modal-queue-floor .open.modal-container:nth-child(5) .modal-mask{
+        @apply z-modal-container-5-0;
+    }
+    .open.modals .modal-queue .modal-queue-floor .open.modal-container:nth-child(5) .modal {
+        @apply z-modal-container-5-1;
+    }
+
+    .open.modals .modal-queue .modal-queue-floor .open.modal-container:nth-child(6) .modal-mask{
+        @apply z-modal-container-6-0;
+    }
+    .open.modals .modal-queue .modal-queue-floor .open.modal-container:nth-child(6) .modal {
+        @apply z-modal-container-6-1;
+    }
+
+    .open.modals .modal-queue .modal-queue-floor .open.modal-container:nth-child(7) .modal-mask{
+        @apply z-modal-container-7-0;
+    }
+    .open.modals .modal-queue .modal-queue-floor .open.modal-container:nth-child(7) .modal {
+        @apply z-modal-container-7-1;
+    }
+
+
+    /* Modal Themes */
+    .open.modals .modal-queue .modal-queue-floor .modal-yellow-theme.open.modal-container .modal{
+        @apply bg-yellow-500;
+    }
+    .open.modals .modal-queue .modal-queue-floor .modal-blue-theme.open.modal-container .modal{
+        @apply bg-blue-500;
+    }
+    .open.modals .modal-queue .modal-queue-floor .modal-green-theme.open.modal-container .modal{
+        @apply bg-green-500;
+    }
+    .open.modals .modal-queue .modal-queue-floor .modal-red-theme.open.modal-container .modal{
+        @apply bg-red-500;
+    }
+
+    /* Modal Sizing */
+    .open.modals .modal-queue .modal-queue-floor .modal-sm.open.modal-container .modal{
+        /* @apply w-2/6; */
+        @apply w-[33vw];
+    }
+    .open.modals .modal-queue .modal-queue-floor  .modal-md.open.modal-container .modal{
+        /* @apply w-3/6 rounded-sm;*/
+        @apply w-[50vw] rounded-sm;
+    }
+    .open.modals .modal-queue .modal-queue-floor .modal-lg.open.modal-container .modal{
+        /* @apply w-4/6 rounded-md; */
+        @apply w-[66vw] rounded-md;
+    }
+    .open.modals .modal-queue  .modal-queue-floor .modal-xl.open.modal-container .modal{
+        /* @apply w-5/6 rounded-lg; */
+        @apply w-[83vw] rounded-lg;
+    }
+
+    /* Modal Headers */
+    .open.modals .modal-queue .modal-queue-floor .open.modal-container .modal .modal-header {
+        @apply text-3xl font-medium;
+    }
+    /* Modal Body */
+    .open.modals .modal-queue .modal-queue-floor .open.modal-container .modal .modal-body {
+        @apply min-h-fit bg-white;
+    }
+
+    /* Modal Body - Rounding - by size*/
+    .open.modals .modal-queue .modal-queue-floor .modal-sm.open.modal-container .modal .modal-body {
+        @apply min-h-[20vh];
+    }
+    .open.modals .modal-queue .modal-queue-floor .modal-md.open.modal-container .modal .modal-body {
+        @apply rounded-b-sm rounded-t-none min-h-[30vh];
+    }
+    .open.modals .modal-queue .modal-queue-floor .modal-lg.open.modal-container .modal .modal-body {
+        @apply rounded-b-md rounded-t-none min-h-[40vh];
+    }
+    .open.modals .modal-queue .modal-queue-floor .modal-xl.open.modal-container .modal .modal-body {
+        @apply rounded-b-lg rounded-t-none min-h-[50vh];
+    }
+
+
+
+    /*.modal-queue.open .modal-container:nth-child(1) {*/
+    /*    @apply fixed left-0 top-0 h-full w-full overflow-y-auto overflow-x-hidden outline-none*/
+    /*}*/
+
+}

@@ -1,6 +1,7 @@
 defmodule NoizuTeamsWeb.Project.Tags do
   use NoizuTeamsWeb, :live_component
   alias Phoenix.LiveView.JS
+  require NoizuTeamsWeb.LiveMessage
   attr :active, :string, default: nil
   def team_selector(assigns) do
   ~H"""
@@ -12,8 +13,12 @@ defmodule NoizuTeamsWeb.Project.Tags do
 
   def expand_prompt(socket) do
     socket
-    |> Phoenix.Component.assigns(expand: !socket.assigns[:expand])
+    |> Phoenix.Component.assign(expand: !socket.assigns[:expand])
     {:ok, socket}
+  end
+
+  def launch_agent_modal(agent) do
+   "spawn:edit:agent:modal:#{agent.identifier}"
   end
 
   def agent(assigns) do
@@ -97,7 +102,7 @@ defmodule NoizuTeamsWeb.Project.Tags do
 
     <div >
     <div class="flex flex-col text-right">
-    <a href={"#edit-" <> @member.slug}>🔏</a>
+    <a  phx-click={ launch_agent_modal(@member)  } href={"#edit-" <> @member.slug}>🔏</a>
     </div>
     </div>
 

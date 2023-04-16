@@ -2,6 +2,7 @@ defmodule NoizuTeams.Project.Member do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @derive NoizuLabs.EntityReference.Protocol
   @primary_key {:identifier, :binary_id, autogenerate: true}
   schema "project_members" do
     field :user_id, Ecto.UUID
