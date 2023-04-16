@@ -29,6 +29,7 @@ defmodule NoizuTeamsWeb.Project.Tags do
       p-2 m-2 mb-5
       min-h-20
       bg-slate-100
+      justify-left
       shadow-lg shadow-slate-400/40
     ">
       <div class="w-6/6 mb-1 ">
@@ -60,6 +61,7 @@ defmodule NoizuTeamsWeb.Project.Tags do
            w-6/6 text-sm text-light bg-white
            max-h-fit
            w-fit
+           text-left justify-left
            border-[1px] border-solid border-slate-800
            overflow-auto
            text-gray-500 font-light font-mono p-2
