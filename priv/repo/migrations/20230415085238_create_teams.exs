@@ -14,5 +14,7 @@ defmodule NoizuTeams.Repo.Migrations.CreateTeams do
       add :modified_on, :utc_datetime_usec, null: false
       add :deleted_on, :utc_datetime_usec
     end
+
+    create unique_index(:teams, [:slug])
   end
 end

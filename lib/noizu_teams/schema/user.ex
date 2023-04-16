@@ -11,6 +11,8 @@ defmodule NoizuTeams.User do
     field :name, :string
     field :status, NoizuTeams.AccountStatusEnum
 
+    field :slug, :string
+
     field :email, :string
     field :login_name, :string
 
@@ -22,10 +24,11 @@ defmodule NoizuTeams.User do
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:name, :email, :login_name, :status, :created_on, :modified_on, :deleted_on])
-    |> validate_required([:name, :email, :login_name, :status, :created_on, :modified_on])
+    |> cast(attrs, [:name, :email, :login_name, :status, :slug, :created_on, :modified_on, :deleted_on])
+    |> validate_required([:name, :email, :login_name, :status, :slug, :created_on, :modified_on])
     |> unique_constraint(:email)
     |> unique_constraint(:login_name)
+    |> unique_constraint(:slug)
   end
 
 
@@ -67,6 +70,38 @@ defmodule NoizuTeams.User do
   end
 
 
+
+  defp random_suffix() do
+    :crypto.strong_rand_bytes(3) |> Base.url_encode64 |> String.slice(0, 3)
+  end
+
+  @doc """
+  Need to deal with uniqueness.
+  """
+  def slugify_name(name, attempts \\ nil)
+  def slugify_name(name, 0), do: {:error, :slug_error}
+  def slugify_name(name, attempts) do
+    suffix = cond do
+      attempts == nil -> ""
+      :else -> "-#{random_suffix()}"
+    end
+    attempts = attempts || 20
+
+    slug = name
+    |> String.downcase()
+    |> String.split()
+    |> (fn [first_name, last_name | _] ->
+      first_initial = String.slice(first_name, 0, 1)
+      last_initial = String.slice(last_name, 0, 3)
+      Enum.join([first_initial, last_initial], "-")
+        end).()
+    slug = slug <> suffix
+    case NoizuTeams.Repo.get_by(NoizuTeams.User, slug: slug) do
+      nil -> {:ok, slug}
+      _ -> slugify_name(name, attempts - 1)
+    end
+  end
+
   def join_project(user, nil), do: nil
   def join_project(user, {:subdomain, subdomain}) do
     with %NoizuTeams.Project{} = project <- NoizuTeams.Repo.get_by(NoizuTeams.Project, subdomain: subdomain) do
@@ -84,38 +119,47 @@ defmodule NoizuTeams.User do
     password = attrs["password"]
     name = attrs["name"]
 
-    user = Repo.get_by(User, email: String.downcase(email)) || Repo.get_by(User, login_name: String.downcase(email))
 
+    user = Repo.get_by(User, email: String.downcase(email)) || Repo.get_by(User, login_name: String.downcase(email))
     case user do
       nil ->
-        password_hash = Bcrypt.hash_pwd_salt(password)
-        changeset = User.changeset(%User{}, %{
-          name: name,
-          email: email,
-          login_name: email,
-          status: :enabled,
-          created_on: DateTime.utc_now(),
-          modified_on: DateTime.utc_now(),
-        }) |> IO.inspect(label: "Change Set")
-        with {:ok, user} <- Repo.insert(changeset),
-             {:ok, _} <- Repo.insert(%User.Credential.Password{
-               user_id: user.identifier,
-               password: password_hash,
-               enabled: true,
-               created_on: DateTime.utc_now(),
-               modified_on: DateTime.utc_now()
-             }) do
 
-          # Attempt to assign to project
-          join_project(user, project)
 
-          {:ok, user}
-        else
-          error ->
-            {:error, {:user_creation_failed, error}}
+        with {:ok, slug} <- slugify_name(name) do
+
+          password_hash = Bcrypt.hash_pwd_salt(password)
+          changeset = User.changeset(%User{}, %{
+            name: name,
+            slug: slug,
+            email: email,
+            login_name: email,
+            status: :enabled,
+            created_on: DateTime.utc_now(),
+            modified_on: DateTime.utc_now(),
+          }) |> IO.inspect(label: "Change Set")
+          with {:ok, user} <- Repo.insert(changeset),
+               {:ok, _} <- Repo.insert(%User.Credential.Password{
+                 user_id: user.identifier,
+                 password: password_hash,
+                 enabled: true,
+                 created_on: DateTime.utc_now(),
+                 modified_on: DateTime.utc_now()
+               }) do
+
+            # Attempt to assign to project
+            join_project(user, project)
+
+            {:ok, user}
+          else
+            error ->
+              {:error, {:user_creation_failed, error}}
+          end
+
         end
+
       _ ->
         {:error, :user_exists}
     end
+
   end
 end

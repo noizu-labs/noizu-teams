@@ -7,7 +7,16 @@ defmodule NoizuTeams.Project.Member do
     field :user_id, Ecto.UUID
     field :project_id, Ecto.UUID
 
+    field :name, :string, virtual: true
+    field :slug, :string, virtual: true
+
     field :role, NoizuTeams.TeamRoleEnum
+
+    field :team_role, NoizuTeams.TeamRoleEnum, virtual: true
+    field :team_position, :string, virtual: true
+    field :team_blurb, :string, virtual: true
+
+
     field :position, :string
     field :blurb, :string
 

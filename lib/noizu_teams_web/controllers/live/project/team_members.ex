@@ -2,6 +2,7 @@ defmodule NoizuTeamsWeb.Project.TeamMembers do
   use NoizuTeamsWeb, :live_view
   import Phoenix.LiveView.JS
   import NoizuTeamsWeb.Nav.Tags
+  import NoizuTeamsWeb.Project.Tags
   import NoizuLabs.EntityReference.Helpers
   alias Phoenix.PubSub
   require Logger
@@ -14,19 +15,13 @@ defmodule NoizuTeamsWeb.Project.TeamMembers do
 
   def render(assigns) do
     ~H"""
-    <div>
+    <div
+    class="
 
+    "
 
-
-
-      <div :for={member <- @team_members}>
-      <%= if member.agent do %>
-      <span class="bg-red-100 border border-red-400 text-red-700">Agent</span>
-
-      <% end %>
-      <span><%= member.name %></span>
-
-      </div>
+    >
+      <.team_member :for={member <- @team_members} member={member} />
     </div>
     """
   end

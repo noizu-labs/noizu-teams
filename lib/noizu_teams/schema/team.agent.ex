@@ -7,8 +7,8 @@ defmodule NoizuTeams.Team.Agent do
     field :team_id, Ecto.UUID
     field :project_agent_id, Ecto.UUID
     field :team_prompt, :string
-
     field :status, NoizuTeams.AccountStatusEnum
+
 
     field :created_on, :utc_datetime_usec
     field :deleted_on, :utc_datetime_usec

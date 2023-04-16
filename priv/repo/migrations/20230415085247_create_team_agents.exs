@@ -6,7 +6,7 @@ defmodule NoizuTeams.Repo.Migrations.CreateTeamAgents do
       add :identifier, :uuid, primary_key: true
       add :team_id, :uuid, null: false
       add :project_agent_id, :uuid, null: false
-      add :team_prompt, :string, null: false
+      add :team_prompt, :text, null: true
 
       add :status, :account_status_enum, null: false
 

@@ -96,7 +96,7 @@ defmodule NoizuTeams.Project do
 
   def membership(project, user) do
     with role = %NoizuTeams.Project.Member{} <- NoizuTeams.Repo.get_by(NoizuTeams.Project.Member, user_id: user.identifier, project_id: project.identifier) do
-      {:ok, role}
+      {:ok, %{role| slug: user.slug}}
     else
       _ ->
         {:error, :not_found}

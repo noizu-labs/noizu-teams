@@ -6,13 +6,14 @@ defmodule NoizuTeams.Project.Agent do
   schema "project_agents" do
     field :project_id, Ecto.UUID
 
-    field :slug, :string
-
     field :name, :string
+    field :slug, :string
     field :description, :string
     field :prompt, :string
+    field :team_prompt, :string, virtual: true
 
     field :status, NoizuTeams.AccountStatusEnum
+    field :team_status, NoizuTeams.AccountStatusEnum, virtual: true
 
     field :created_on, :utc_datetime_usec
     field :deleted_on, :utc_datetime_usec
