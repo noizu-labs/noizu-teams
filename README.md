@@ -23,37 +23,71 @@ https://github.com/noizu/artificial_intelligence
 https://github.com/noizu/roko-coin/blob/main/README.md
 
 
-Noizu Teams Overview
+Noizu Teams (Distributed GPT)
 ===============================
 
-Distributed GPT
-Distributed GPT is a multi-modal tool designed for collaboration in a virtual environment. It extends Personas/GPT models with simulated history, memory, and agendas, utilizing various OpenAI and HuggingFace APIs, as well as other external tools.
+Distributed GPT is a multi-modal tool designed for human/ai team member collaboration in a virtual environment.
 
-This project is built using:
+Noizu teams provide a name, face, and functional level of behavioral/skill continuity to virtual specialists internally built on top of multiple layers of internal and external prompts/contexts/purpose tuned models, and monitoring/intent/agenda management systems.
 
-- Elixir
-- Phoenix LiveView (1.6 - to allow chatgpt support of generated code)
-- Redis
-- TimeScaleDB
-- Various OpenAI and HuggingFace APIs
-- Various other APIs
+Agent specialization and reinforced behavioral/skill-set continuity provides the following key benefits: 
 
-# Planned Features
+- Context/Role compartementalization allows the system to horizontally scale out its over all problem solving capacity on existing tech with out requiring any breakthroughs in any one underlying technology and with out the need for constant model retraining. In much the same manner that problem solving is already scaled out horizontally in the business and academic world via specialization. 
 
-- Individual agents/personas with separate GPT context for working memory
-- Private information and conversations between agents
-- Simulated memory and context for growth and differentiation of agents over time
+- Enforcing agent behavorial/functional continuity allows for tighter team integration/optimization and avoids unnecesarry/avoidable disruptions to team dynamics that would otherwise harm overall organizational fitness, and allows the rate of change/tuning to remain optimal for the over all organization while protecting against catatrophic forgetting/divergence. 
+
+Specifically continuous ongoing finetuning and stabilization of the mix of individual agent inner heuristics/models and their parameters may be played out in the form of running different message trees between agents and applying back propogration tuning to select the parameters/subcomponent mix based on agent/monitoring and human check point feed back. E.g. does Agent-B with GPT-5.1 and option 1 or 2 ... or N
+behave in the manner most other agents had predicted as likey (not divergent from the previous configuration) and which tweak/improvent maximizes quality of the agents message's outputs/final outcome while minimzing the change in the agent's behavior. 
+
+- Corrollarly multiple solution spaces can be played out in depth in advance of user input/choice taking (and using branch prediction and modelling human operators likely requests/response past their input) so that not only can statistically likely choices of human decision makers and human and consumer approval be played out in advance and ready and statistically likely) as select but divergence in what the system felt was the optimal solution and what was the actual solution can be backpropogated across the mix of agents and the smallest targeted tweak applied or noted on which ever specific agent decisions results in the outcome paths that ended up closest to what the end user/consumer ultimately preferred, allowing for isolated discrete tweaks of prompts/temperment and if necessary key nodes while minimizing the risk of catastrophic forgetting, need for retratining large sections of the system. 
+
+- It avoids the need for standalone super intelligences, and potential for runaway misalignment while allows for the stacking/reapplication of existing well understood techniques to improve outcomes with existing capabilites (genetic algorithms, tree prodiction, prompt, preference tweaks)
+
+- It is understandable, in that it allows for auditing/tracking of why decisions are made at eacj step to the final outcome() and the exact sequence of inter agenet/modal inputs/ouputs may be tracked, along with agent self introspection notes.
+
+- It is patchable, self policing, and previous agent weights/prompts can be retained/referenced for monitoring divergent behaviors in agents, consensus gatthering can be to track across various iterations of agents, and where and how agent/subcomponents diverge over time (and why) can be tracked for greater modular control over the system and insight and monitoring.   
+
+
+
+
+
+
+By tracking per agent context/state/history and post training knowledge
+
+
+This project will be built on:
+
+- A Massively Horizontally Scalable Elixir/Erlang Backend
+- Message/PubSub based cross agent/system/plugin message passing/prioritization and 
+- RocksDBMnesia/TimeScaleDB/(tbd)VectorDB and other persistance layers. 
+- Manticore + Vector based record/embedding/history search.
+- Model Prompting/Tuning for injecting/extracted web-socket like event/request processing across cluster
+- Multiple role/purpose aligned forward facing agents internally wrapping multiple prompt/context/model stacks.
+- Multi Node/Server Orchestration and Moderation and management of Team/Agent short and long Intent/Goal (this supports for horizontal scale out 
+
+# Goals
+
+- Individual agent/personas with separate prompts/context for working memory behavior
+- Support for private information and conversations tracking between agents/users/tools |
+    Compartamentalized context/information allows us to reduce the need for each model to fully track all relavent current and post training context.
+    Segmented context/role allow for horizontal scale allowing for significantly more task specific 
+
+all items in context. This model is an expert on API1, this model is an export on API2 , future changes can be discussed with both oth them to get to final working solution.) *E.g. within current available context windows an arbitrary amount of post 
+- Simulated memory and context for growth and differentiation of agents over time via self and external manipulation and refeinment of model behavor (e.g.  self correction to avoid incorrect output, erroneous data) in the form of self + external system prompt editting.
 - Integration of external tools for expanded agent capabilities
-- A coordinating system for message passing and moderation
+- WebSocket compatible protocol for coordinating message passing between different agents (e.g. models loaded with different prompt context/intent), team members and and external information sources/tootls. 
 - Docker Containers Accessible via webhooks by AI agents for collaborative development with some safety nets. @see terminal-service folder.  https://github.com/noizu-labs/noizu-teams/tree/main/terminal-service
-- Non OpenAI Plugin Engine that can be applied to any AI model through careful prompting and minor tuning + response correcting/hinting. 
+- Non OpenAI Plugin Engine that can be applied to any AI model through careful prompting and minor tuning + response correcting/hinting (multi-modlality)
+- self syste moderation/rule-engine integration.
+- central message dispatchiong/moderation/flagging.
+- Agent persistence/state tracked in cluster via GenServer services/workers making for straight forward way to scale out system capabilites 
+
+
+
 
 - AI notes https://github.com/noizu-labs/noizu-collab/blob/main/prompt-history/session-1.md
-
 - Jira/Github Ticket Interop (extending https://github.com/noizu-labs/noizu-collab/blob/main/tools/sync-github) 
-
 - Noizu Prompts @see 
-
 
 WIP
 ===============================
