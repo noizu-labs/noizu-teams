@@ -25,6 +25,8 @@ defmodule NoizuTeamsWeb.LiveMessage do
   ) = msg) do
 
     # This is super inefficient, better routing will be needed in the future.
+    # - Consider just switching to Syn and dedicating a message coordinater per User or User Session, although there are some upsides to pushing updates 
+    # - via pub sub for keeping pages synched across users/devices/sessions with out needing to add a bunch of addtiional logic. 
     keys = [
       "#{s_subject}:*:*",
       "#{s_subject}:#{s_instance}:*",
