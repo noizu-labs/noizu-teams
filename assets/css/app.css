@@ -10,6 +10,70 @@
         scrollbar-gutter: stable;
     }
 
+    .sidebar.expanded {
+        @apply w-60;
+    }
+    .sidebar.collapsed {
+        @apply w-8;
+    }
+
+    .sidebar {
+        @apply bg-gray-200 shadow-lg shadow-slate-900 rounded-none h-full min-h-screen align-top flex flex-col flex-shrink-0;
+    }
+
+    .sidebar.left-sidebar {
+        @apply mr-4;
+    }
+    .sidebar.right-sidebar {
+        @apply ml-4;
+    }
+    .sidebar.expanded .wrapper {
+        @apply w-60;
+    }
+    .sidebar.collapsed .wrapper {
+        @apply w-8;
+    }
+    .sidebar .wrapper {
+        @apply h-full fixed flex flex-col align-bottom;
+    }
+    .sidebar.left-sidebar .wrapper {
+        @apply items-end;
+    }
+    .sidebar.right-sidebar .wrapper {
+        @apply items-start;
+    }
+
+    .sidebar .wrapper .toggle {
+        @apply relative top-[80%]  bg-gray-400 rounded-2xl align-middle m-0 p-2;
+    }
+    .sidebar.left-sidebar .wrapper .toggle {
+        @apply left-4;
+    }
+    .sidebar.right-sidebar .wrapper .toggle {
+        @apply right-4;
+    }
+
+    .sidebar.left-sidebar.expanded .wrapper .toggle i {
+        @apply hero-arrow-left-solid;
+    }
+    .sidebar.left-sidebar.collapsed .wrapper .toggle i {
+        @apply hero-arrow-right-solid;
+    }
+
+    .sidebar.right-sidebar.expanded .wrapper .toggle i {
+        @apply hero-arrow-right-solid;
+    }
+    .sidebar.right-sidebar.collapsed .wrapper .toggle i {
+        @apply hero-arrow-left-solid;
+    }
+
+    .sidebar .content {
+        @apply w-full z-80 p-2;
+    }
+    .sidebar.collapsed .content {
+        @apply hidden;
+    }
+
     /* Modal Queue Entry Point */
     .modals {
 

@@ -7,8 +7,8 @@ services:
     hostname: noizu-teams-terminal 
     image: "terminal-service"
     ports:
-      - 127.0.0.1:6500:8000
-      - 127.0.0.1:6600:4000
+      - 0.0.0.0:6500:8000
+      - 0.0.0.0:6600:4000
     networks:
       - noizu-teams-net
   redis:
@@ -18,7 +18,7 @@ services:
     logging:
       driver: "none"
     ports:
-      - 127.0.0.1:6501:6379
+      - 0.0.0.0:6501:6379
     networks:
       - noizu-teams-net
   database:
@@ -32,6 +32,6 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: noizu_teams
     ports:
-      - 127.0.0.1:6502:5432
+      - 0.0.0.0:6502:5432
     networks:
       - noizu-teams-net

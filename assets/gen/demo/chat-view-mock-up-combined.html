@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/tailwind.css">
+    <title>Chat View Mock-up Combined</title>
+</head>
+<body class="bg-gray-100 dark:bg-gray-800">
+
+<!-- NavBar -->
+<header class="bg-white dark:bg-gray-900 shadow">
+    <div class="container mx-auto px-6 py-3">
+        <div class="flex items-center justify-between">
+            <div class="text-gray-800 dark:text-gray-100 font-bold text-2xl">
+                Collaborative Coding Platform
+            </div>
+            <div class="flex items-center space-x-4">
+                <button class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Join</button>
+                <button class="text-blue-500 dark:text-blue-400 hover:text-blue-600">Login</button>
+            </div>
+        </div>
+    </div>
+</header>
+<!-- NavBar End -->
+
+<!-- Main Content -->
+<main class="container mx-auto px-6 py-8">
+    <div class="grid grid-cols-12 gap-6">
+        <!-- User List/Search -->
+        <aside class="col-span-3">
+            <div class="bg-white dark:bg-gray-700 shadow rounded p-4">
+                <div class="relative">
+                    <input type="text" class="w-full bg-gray-100 dark:bg-gray-800 rounded border-0 focus:ring-0 p-3" placeholder="Search users...">
+                    <button class="absolute right-0 top-0 mt-3 mr-4">
+                        <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 21l-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0z"></path></svg>
+                    </button>
+                </div>
+                <div class="mt-6">
+                    <div class="flex items-center space-x-4">
+                        <img class="h-10 w-10 rounded-full" src="https://images.unsplash.com/photo-1618346136962-f99e3b3bc8a0?auto=format&fit=crop&w=60&q=80" alt="User image">
+                        <div>
+                            <h4 class="text-gray-800 dark:text-gray-100 font-semibold">John Doe</h4>
+                            <p class="text-gray-500 dark:text-gray-400 text-sm">AI-Bob</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4 mt-4">
+                        <img class="h-10 w-10 rounded-full" src="https://images.unsplash.com/photo-1620055568179-9fc53b2d9191?auto=format&fit=crop&w=60&q=80" alt="User image">
+                        <div>
+                            <h4 class="text-gray-800 dark:text-gray-100 font-semibold">Jane Smith</h4>
+                            <p class="text-gray-500 dark:text-gray-400 text-sm">AI-Alice</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        <!-- User List/Search End -->
+
+        <!-- Chat -->
+        <section class="col-span-6">
+            <div class="bg-white dark:bg-gray-700 shadow rounded p-4">
+                <div class="chat-messages space-y-4">
+                    <!-- Message -->
+                    <div class="flex items-end space-x-4">
+                        <img class="h-10 w-10 rounded-full" src="https://images.unsplash.com/photo-1618346136962-f99e3b3bc8a0?auto=format&fit=crop&w=60&q=80" alt="User image">
+                        <div class="flex flex-col space-y-1">
+                            <div class="bg-blue-500 text-white rounded-tl-lg rounded-tr-lg rounded-br-lg py-2 px-4">
+                                Hello! How's the project going?
+                            </div>
+                            <div class="text-gray-500 text-xs">
+                                John Doe, 10:15 AM
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Message End -->
+
+                    <!-- System Message -->
+                    <div class="flex items-center space-x-4">
+                        <div class="h-10 w-10 rounded-full flex items-center justify-center bg-gray-300 dark:bg-gray-500">
+                            <svg class="h-5 w-5 text-gray-500 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="6" r="3"></circle><circle cx="18" cy="18" r="3"></circle></svg>
+                        </div>
+                        <div class="flex flex-col space-y-1">
+                            <div class="bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300 rounded-tl-lg rounded-tr-lg rounded-bl-lg py-2 px-4">
+                                New GitHub commit: Fixed a bug in the authentication module.
+                            </div>
+                            <div class="text-gray-500 text-xs">
+                                System, 10:20 AM
+                            </div>
+                        </div>
+                    </div>
+                    <!-- System Message End -->
+                    <!-- Message -->
+                    <div class="flex items-end space-x-4">
+                        <img class="h-10 w-10 rounded-full" src="https://images.unsplash.com/photo-1618346136962-f99e3b3bc8a0?auto=format&fit=crop&w=60&q=80" alt="User image">
+                        <div class="flex flex-col space-y-1">
+                            <div class="bg-blue-500 text-white rounded-tl-lg rounded-tr-lg rounded-br-lg py-2 px-4">
+                                Here's a code snippet for traversing a binary tree in C++:
+                                <pre><code class="language-cpp">void inorderTraversal(TreeNode* root) {
+  if (root == nullptr) {
+    return;
+  }
+  inorderTraversal(root->left);
+  std::cout << root->val << " ";
+  inorderTraversal(root->right);
+}</code></pre>
+                            </div>
+                            <div class="text-gray-500 text-xs">
+                                John Doe, 10:45 AM
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Message End -->
+
+                </div>
+                <!-- Chat Input -->
+                <div class="mt-4">
+                    <div class="relative">
+                        <textarea class="w-full p-4 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded" rows="1" placeholder="Type your message..."></textarea>
+                        <button class="absolute bottom-4 right-4 bg-blue-500 hover:bg-blue-600 text-white p-2 rounded" type="button">Send</button>
+                    </div>
+                </div>
+                <!-- Chat Input End -->
+            </div>
+        </section>
+        <!-- Chat End -->
+        <!-- Docker Terminal -->
+        <section class="bg-gray-100 dark:bg-gray-800 px-6 py-4 mt-8 rounded-lg">
+            <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">Docker Terminal</h2>
+            <pre class="bg-black text-white rounded p-4 overflow-auto" style="max-height: 300px;"><code class="language-bash">$ docker ps
+CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS          PORTS     NAMES
+72e247e5cb5f   my_app    "docker-entrypoint.s…"   36 seconds ago   Up 35 seconds             my_app_1
+
+$ docker exec -it my_app_1 /bin/bash
+root@72e247e5cb5f:/app# python manage.py test
+...
+----------------------------------------------------------------------
+Ran 3 tests in 0.001s
+
+OK
+</code></pre>
+        </section>
+        <!-- Docker Terminal End -->
+
+        <!-- Footer -->
+        <footer class="mt-8">
+            <p class="text-center text-gray-600 dark:text-gray-400">2023 &copy; My Project. All rights reserved.</p>
+        </footer>
+        <!-- Footer End -->
+    </div>
+</main>
+</body>
+</html>

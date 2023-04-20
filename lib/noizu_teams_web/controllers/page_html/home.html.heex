@@ -1,7 +1,16 @@
 
+<style>
+  .collapsed { width: 16px; }
+  .expanded { width: 256px; }
+</style>
+
 <div class="flex  z-50">
 
-    <div class="w-1/6 p-4">
+  <div class="sidebar left-sidebar expanded">
+    <div class="wrapper">
+      <div class="toggle"><i></i></div>
+    </div>
+    <div class="content">
       <%= live_render(
       @conn,
       NoizuTeamsWeb.Project.TeamSelector,
@@ -9,25 +18,33 @@
       session: @team_selector
       ) %>
       <%= live_render(
-        @conn,
-        NoizuTeamsWeb.Project.TeamMembers,
-        id: "team-members",
-        session: %{"team" => @active_team, "project" => @active_project}
+      @conn,
+      NoizuTeamsWeb.Project.TeamMembers,
+      id: "team-members",
+      session: %{"team" => @active_team, "project" => @active_project}
       ) %>
     </div>
+  </div>
 
 
-  <div class="w-4/6 p-4">
+
+  <div class="w-full p-4">
     <%= live_render(@conn, NoizuTeamsWeb.ChatLive) %>
   </div>
 
 
-  <div class="w-1/6 p-4">
-    <!-- Right Section - Configuration -->
-    <h2 class="text-lg font-bold mb-4">Configuration</h2>
-    <div class="bg-white rounded-lg shadow p-4 mb-4">
-      <!-- Placeholder card with details -->
+  <div id="left-sidebar" class="sidebar right-sidebar collapsed">
+    <div class="wrapper">
+      <div id="left-sidebar-toggle" class="toggle"><i></i></div>
+    </div>
+    <div class="content">
+      <!-- Right Section - Configuration -->
+      <h2 class="text-lg font-bold mb-4">Configuration</h2>
+      <div class="bg-white rounded-lg shadow p-4 mb-4">
+        <!-- Placeholder card with details -->
+      </div>
     </div>
   </div>
+
 
 </div>

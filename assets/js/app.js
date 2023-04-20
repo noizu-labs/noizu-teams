@@ -39,3 +39,20 @@ liveSocket.connect()
 // >> liveSocket.disableLatencySim()
 window.liveSocket = liveSocket
 
+
+window.onload = function () {
+    let toggles = document.getElementsByClassName("toggle");
+    for (let i in toggles) {
+        let toggle = toggles[i];
+        toggle.onclick = function() {
+            let sidebar = toggle.parentNode.parentNode;
+            if (sidebar.classList.contains('expanded')) {
+                sidebar.classList.remove('expanded');
+                sidebar.classList.add('collapsed');
+            } else {
+                sidebar.classList.remove('collapsed');
+                sidebar.classList.add('expanded');
+            }
+        };
+    }
+}
