@@ -64,6 +64,22 @@ defmodule NoizuTeams.Repo.Migrations.CreateProject do
       add :joined_on, :utc_datetime_usec, null: false
     end
 
+    #  field :channel_id, Ecto.UUID
+    #    field :project_member_id, Ecto.UUID
+    #    field :message, :string
+    #    field :created_on, :utc_datetime_usec
+    #    field :modified_on, :utc_datetime_usec
+    #    field :deleted_on, :utc_datetime_usec
+    create table(:project_channel_messages, primary_key: false) do
+      add :identifier, :uuid, primary_key: true
+      add :channel_id, :uuid, null: false
+      add :project_member_id, :uuid, null: false
+      add :message, :text, null: false
+      add :created_on, :utc_datetime_usec, null: false
+      add :modified_on, :utc_datetime_usec, null: false
+      add :deleted_on, :utc_datetime_usec
+    end
+
     create table(:user_project_channels, primary_key: false) do
       add :identifier, :uuid, primary_key: true
       add :project_id, :uuid, null: false

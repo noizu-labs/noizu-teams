@@ -28,7 +28,10 @@ defmodule NoizuTeams.Project.Agent do
     |> validate_required([:project_id, :slug, :name, :description, :prompt, :status, :created_on, :modified_on, :deleted_on])
   end
 
-
+  def by_slug(project, slug) do
+    s = NoizuTeams.Repo.get_by(NoizuTeams.Project.Agent, project_id: project.identifier, slug: slug)
+    {:ok, s}
+  end
 
   def entity(subject, context \\ nil)
   def entity(%__MODULE__{} = this, _) do

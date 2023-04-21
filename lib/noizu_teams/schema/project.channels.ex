@@ -1,7 +1,7 @@
 defmodule NoizuTeams.Project.Channel do
   use Ecto.Schema
   import Ecto.Changeset
-
+  import Ecto.Query
   @derive NoizuLabs.EntityReference.Protocol
   @primary_key {:identifier, :binary_id, autogenerate: true}
   schema "project_channels" do
@@ -25,7 +25,14 @@ defmodule NoizuTeams.Project.Channel do
     |> validate_required([:project_id, :slug, :private, :name, :description, :created_on, :modified_on])
   end
 
-
+  def messages(channel) do
+    query = from m in NoizuTeams.Project.Channel.Message,
+            where: m.channel_id == ^channel.identifier,
+            where: is_nil(m.deleted_on),
+            order_by: m.created_on,
+            select: m
+    NoizuTeams.Repo.all(query)
+  end
 
   def entity(subject, context \\ nil)
   def entity(%__MODULE__{} = this, _) do

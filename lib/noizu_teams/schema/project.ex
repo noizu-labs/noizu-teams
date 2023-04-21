@@ -21,6 +21,14 @@ defmodule NoizuTeams.Project do
     field :membership, :map, virtual: true
   end
 
+  def default_channel(project, user) do
+    query = from c in NoizuTeams.Project.Channel,
+                 where: c.project_id == ^project.identifier,
+                 limit: 1,
+                 select: c
+    {:ok, NoizuTeams.Repo.one(query)}
+  end
+
   def channels(project) do
     query = from c in NoizuTeams.Project.Channel,
             where: c.project_id == ^project.identifier,
@@ -97,6 +105,24 @@ defmodule NoizuTeams.Project do
   def default_team(project, user) do
     with {:ok, teams} <- teams(project, user) do
       {:ok, List.first(teams)}
+    end
+  end
+
+  def user_member_id(project, user) do
+    with role = %NoizuTeams.Project.Member{} <- NoizuTeams.Repo.get_by(NoizuTeams.Project.Member, member_type: :user, member_id: user.identifier, project_id: project.identifier) do
+      {:ok, %{role| slug: user.slug}}
+    else
+      _ ->
+        {:error, :not_found}
+    end
+  end
+
+  def agent_member_id(project, agent) do
+    with role = %NoizuTeams.Project.Member{} <- NoizuTeams.Repo.get_by(NoizuTeams.Project.Member, member_type: :agent, member_id: agent.identifier, project_id: project.identifier) do
+      {:ok, %{role| slug: agent.slug}}
+    else
+      _ ->
+        {:error, :not_found}
     end
   end
 

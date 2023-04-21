@@ -185,6 +185,36 @@ defmodule NoizuTeams.Repo.Migrations.ProjectSetup do
       joined_on: now,
     } |> Repo.insert()
 
+
+    %NoizuTeams.Project.Channel{
+      identifier: "5b7bfee3-9400-4a82-b786-ec3aade00f83",
+      project_id: "54d49532-1625-4b3a-94f6-65a378575356",
+      slug: "scrum",
+      private: false,
+      name: "Scrum",
+      description: "Scrum Update Channel",
+      created_on: now,
+      modified_on: now,
+
+    } |> Repo.insert()
+
+    %NoizuTeams.Project.Channel.Member{
+      channel_id: "5b7bfee3-9400-4a82-b786-ec3aade00f83",
+      project_member_id: "a4183803-bc55-4fcf-a3a7-baa8cacd3f55",
+      joined_on: now,
+    } |> Repo.insert()
+    %NoizuTeams.Project.Channel.Member{
+      channel_id: "5b7bfee3-9400-4a82-b786-ec3aade00f83",
+      project_member_id: "3920eb59-2161-4b64-a251-4574fb681fd7",
+      joined_on: now,
+    } |> Repo.insert()
+    %NoizuTeams.Project.Channel.Member{
+      channel_id: "5b7bfee3-9400-4a82-b786-ec3aade00f83",
+      project_member_id: "93e61443-c293-4bca-a983-194d779e89ee",
+      joined_on: now,
+    } |> Repo.insert()
+
+
   end
 
   def down do

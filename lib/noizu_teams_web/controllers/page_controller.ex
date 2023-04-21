@@ -19,8 +19,9 @@ defmodule NoizuTeamsWeb.PageController do
 
       with id = {:subdomain, slug} <- project(conn, params),
            {:ok, project} <- NoizuTeams.Project.entity(id),
-           {:ok, project_membership} = NoizuTeams.Project.membership(project, user),
-           true <- project_membership.role not in [:deactivated, :pending]
+           {:ok, project_membership} <- NoizuTeams.Project.membership(project, user),
+           true <- project_membership.role not in [:deactivated, :pending],
+           {:ok, channel} <- NoizuTeams.Project.default_channel(project, user)
            #{:ok, team} <- NoizuTeams.Project.default_team(project, user),
            #true <- (project_membership.role in [:owner, :admin]) or (team.membership and team.membership.role not in [:deactivated, :pending])
         do
@@ -39,6 +40,7 @@ defmodule NoizuTeamsWeb.PageController do
                #team_selector: team_selector,
                active_user: user,
                active_project: %{project | membership: project_membership},
+               active_channel: channel
                #active_team: team,
              }
            )
@@ -49,6 +51,7 @@ defmodule NoizuTeamsWeb.PageController do
                %{
                  active_user: user,
                  active_project: nil,
+                 active_channel: nil
                #  active_team: nil,
                #  active_role: nil,
                }

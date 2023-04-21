@@ -1,10 +1,17 @@
 @import "tailwindcss/base";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
-@import "github-markdown-css/github-markdown-light.css";
+@import "github-markdown-css/github-markdown-dark.css";
 /* This file is for your main application CSS */
 
 @layer components {
+    .markdown-body {
+        background-color: inherit !important;
+    }
+    .markdown-body code {
+        background-color: black;
+    }
+
     /* Retain Spacing for sidebar to prevent flow flickers when enabled */
     .stable-gutter {
         scrollbar-gutter: stable;

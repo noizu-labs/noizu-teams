@@ -19,7 +19,7 @@
 
 
   <div class="w-full  p-4 overflow-auto">
-    <%= live_render(@conn, NoizuTeamsWeb.ChatLive) %>
+    <%= live_render(@conn, NoizuTeamsWeb.ChatLive, session: %{"user" => @active_user, "project" => @active_project, "channel" => @active_channel}) %>
   </div>
 
 
