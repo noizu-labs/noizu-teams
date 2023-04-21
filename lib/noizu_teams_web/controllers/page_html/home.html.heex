@@ -10,18 +10,8 @@
     <div class="wrapper">
       <div class="toggle"><i></i></div>
       <div class="content">
-        <%= live_render(
-        @conn,
-        NoizuTeamsWeb.Project.TeamSelector,
-        id: "team-selector",
-        session: @team_selector
-        ) %>
-        <%= live_render(
-        @conn,
-        NoizuTeamsWeb.Project.TeamMembers,
-        id: "team-members",
-        session: %{"team" => @active_team, "project" => @active_project}
-        ) %>
+          <%= live_render(@conn, NoizuTeamsWeb.User.Project.Channels, session: %{"user" => @active_user, "project" => @active_project}) %>
+
       </div>
     </div>
   </div>

@@ -88,13 +88,13 @@ defmodule NoizuTeams.User do
     attempts = attempts || 20
 
     slug = name
-    |> String.downcase()
-    |> String.split()
-    |> (fn [first_name, last_name | _] ->
+           |> String.downcase()
+           |> String.split()
+           |> (fn [first_name, last_name | _] ->
       first_initial = String.slice(first_name, 0, 1)
       last_initial = String.slice(last_name, 0, 3)
       Enum.join([first_initial, last_initial], "-")
-        end).()
+               end).()
     slug = slug <> suffix
     case NoizuTeams.Repo.get_by(NoizuTeams.User, slug: slug) do
       nil -> {:ok, slug}
@@ -105,12 +105,38 @@ defmodule NoizuTeams.User do
   def join_project(user, nil), do: nil
   def join_project(user, {:subdomain, subdomain}) do
     with %NoizuTeams.Project{} = project <- NoizuTeams.Repo.get_by(NoizuTeams.Project, subdomain: subdomain) do
-      Repo.insert(%NoizuTeams.Project.Member{
+      {:ok, member} = Repo.insert(%NoizuTeams.Project.Member{
         project_id: project.identifier,
-        user_id: user.identifier,
+        member_type: :user,
+        member_id: user.identifier,
         role: :pending,
         joined_on: DateTime.utc_now(),
       })
+
+      # Join public channels
+      now = DateTime.utc_now()
+      with {:ok, channels} <- NoizuTeams.Project.channels(project) |> IO.inspect(label: "PROJECT CHANNELS") do
+        Enum.map(channels, fn(channel) ->
+          %NoizuTeams.Project.Channel.Member{
+            channel_id: channel.identifier,
+            project_member_id: member.identifier,
+            joined_on: now,
+          } |> Repo.insert()
+
+          %NoizuTeams.User.Project.Channel{
+            channel_id: channel.identifier,
+            project_id: project.identifier,
+            user_id: user.identifier,
+            starred: false,
+            joined_on: now,
+          } |> Repo.insert()
+        end)
+
+
+
+      end
+
+      {:ok, member}
     end
   end
 

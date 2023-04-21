@@ -5,7 +5,8 @@ defmodule NoizuTeams.Project.Member do
   @derive NoizuLabs.EntityReference.Protocol
   @primary_key {:identifier, :binary_id, autogenerate: true}
   schema "project_members" do
-    field :user_id, Ecto.UUID
+    field :member_type, NoizuTeams.MemberTypeEnum
+    field :member_id, Ecto.UUID
     field :project_id, Ecto.UUID
 
     field :name, :string, virtual: true
@@ -28,7 +29,7 @@ defmodule NoizuTeams.Project.Member do
   @doc false
   def changeset(team_member, attrs) do
     team_member
-    |> cast(attrs, [:project_id, :user_id, :role, :position, :blurb, :joined_on, :removed_on])
-    |> validate_required([:project_id, :user_id, :role, :joined_on])
+    |> cast(attrs, [:project_id, :member_type, :member_id, :role, :position, :blurb, :joined_on, :removed_on])
+    |> validate_required([:project_id, :member_type, :member_id, :role, :joined_on])
   end
 end

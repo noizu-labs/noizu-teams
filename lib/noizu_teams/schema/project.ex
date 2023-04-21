@@ -21,6 +21,12 @@ defmodule NoizuTeams.Project do
     field :membership, :map, virtual: true
   end
 
+  def channels(project) do
+    query = from c in NoizuTeams.Project.Channel,
+            where: c.project_id == ^project.identifier,
+            select: c
+    {:ok, NoizuTeams.Repo.all(query)}
+  end
 
   defp default_team_sort__time(a,b) do
     case DateTime.compare(a.created_on, b.created_on) do
@@ -95,7 +101,7 @@ defmodule NoizuTeams.Project do
   end
 
   def membership(project, user) do
-    with role = %NoizuTeams.Project.Member{} <- NoizuTeams.Repo.get_by(NoizuTeams.Project.Member, user_id: user.identifier, project_id: project.identifier) do
+    with role = %NoizuTeams.Project.Member{} <- NoizuTeams.Repo.get_by(NoizuTeams.Project.Member, member_type: :user, member_id: user.identifier, project_id: project.identifier) do
       {:ok, %{role| slug: user.slug}}
     else
       _ ->

@@ -1,8 +1,8 @@
-<%= if assigns[:active_user] do %>
+<%= if assigns[:active_project] do %>
 <.navbar active-user={assigns[:active_user]} >
   <:logo>
     <.link navigate={"/"} class="flex w-1/6 items-center">
-      <.logo />
+      <.logo name={assigns[:active_project].name} />
     </.link>
   </:logo>
 </.navbar>
@@ -10,7 +10,7 @@
 <.navbar active-user={assigns[:active_user]} >
 <:logo>
   <.link navigate={"/"} class="flex w-1/6 items-center">
-  <.logo />
+  <.logo name="Noizu Teams" />
 </.link>
 </:logo>
 </.navbar>

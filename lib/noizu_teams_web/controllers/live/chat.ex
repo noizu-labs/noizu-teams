@@ -9,7 +9,7 @@ defmodule NoizuTeamsWeb.ChatLive do
     ~H"""
     <div class="h-full flex flex-col">
       <div class="bg-white rounded-lg shadow p-4 flex-1 mb-4 overflow-y-auto">
-        <h2 class="text-lg font-bold mb-4">Chat</h2>
+        <h2 class="text-lg font-bold mb-4">#General</h2>
 
         <%= for message <- @messages do %>
           <%= render_message(message) %>
@@ -37,7 +37,7 @@ defmodule NoizuTeamsWeb.ChatLive do
     """
   end
 
-  def mount(_params, _session, socket) do
+  def mount(_params, session, socket) do
     messages = fetch_messages()
     {:ok, assign(socket, messages: messages)}
   end
@@ -65,10 +65,7 @@ defmodule NoizuTeamsWeb.ChatLive do
   defp fetch_messages() do
     # Replace this with your code to fetch messages from your database or API
     [
-      %{author: "Grace", content: "Hello!"},
-      %{author: "Darin", content: "How are you?"},
-      %{author: "Grace", content: "I'm good, thanks!"},
-      %{author: "Darin", content: "What's new?"},
+
     ]
   end
 end

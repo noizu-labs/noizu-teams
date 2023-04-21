@@ -20,26 +20,26 @@ defmodule NoizuTeamsWeb.PageController do
       with id = {:subdomain, slug} <- project(conn, params),
            {:ok, project} <- NoizuTeams.Project.entity(id),
            {:ok, project_membership} = NoizuTeams.Project.membership(project, user),
-           true <- project_membership.role not in [:deactivated, :pending],
-           {:ok, team} <- NoizuTeams.Project.default_team(project, user),
-           true <- (project_membership.role in [:owner, :admin]) or (team.membership and team.membership.role not in [:deactivated, :pending])
+           true <- project_membership.role not in [:deactivated, :pending]
+           #{:ok, team} <- NoizuTeams.Project.default_team(project, user),
+           #true <- (project_membership.role in [:owner, :admin]) or (team.membership and team.membership.role not in [:deactivated, :pending])
         do
-
-        team_selector = %{
-          "user" => ERP.ref(user) |> ok?,
-          "project" => ERP.ref(project) |> ok?,
-          "project_role" => project_membership.role,
-          "team" => ERP.ref(team) |> ok?,
-          "team_role" => get_in(team, [Access.key(:membership), Access.key(:role, :none)])
-        }
+#
+#        team_selector = %{
+#          "user" => ERP.ref(user) |> ok?,
+#          "project" => ERP.ref(project) |> ok?,
+#          "project_role" => project_membership.role,
+#          "team" => ERP.ref(team) |> ok?,
+#          "team_role" => get_in(team, [Access.key(:membership), Access.key(:role, :none)])
+#        }
 
         conn
         |> render(:home,
              %{
-               team_selector: team_selector,
+               #team_selector: team_selector,
                active_user: user,
                active_project: %{project | membership: project_membership},
-               active_team: team,
+               #active_team: team,
              }
            )
       else
@@ -49,8 +49,8 @@ defmodule NoizuTeamsWeb.PageController do
                %{
                  active_user: user,
                  active_project: nil,
-                 active_team: nil,
-                 active_role: nil,
+               #  active_team: nil,
+               #  active_role: nil,
                }
              )
       end
