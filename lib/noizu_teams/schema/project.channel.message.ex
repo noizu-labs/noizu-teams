@@ -6,6 +6,7 @@ defmodule NoizuTeams.Project.Channel.Message do
   schema "project_channel_messages" do
     field :channel_id, Ecto.UUID
     field :project_member_id, Ecto.UUID
+    field :sender, :string, virtual: true
     field :message, :string
     field :created_on, :utc_datetime_usec
     field :modified_on, :utc_datetime_usec

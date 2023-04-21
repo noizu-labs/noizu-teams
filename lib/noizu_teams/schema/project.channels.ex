@@ -25,13 +25,37 @@ defmodule NoizuTeams.Project.Channel do
     |> validate_required([:project_id, :slug, :private, :name, :description, :created_on, :modified_on])
   end
 
+  def members(channel) do
+    query = from m in NoizuTeams.Project.Channel.Member,
+                 where: m.channel_id == ^channel.identifier,
+                 join: pm in NoizuTeams.Project.Member,
+                  on: pm.identifier == m.project_member_id and pm.member_type == :agent,
+                 join: a in NoizuTeams.Project.Agent,
+                  on: a.identifier == pm.member_id,
+                 select: a.slug
+    NoizuTeams.Repo.all(query)
+  end
+
   def messages(channel) do
     query = from m in NoizuTeams.Project.Channel.Message,
             where: m.channel_id == ^channel.identifier,
             where: is_nil(m.deleted_on),
             order_by: m.created_on,
             select: m
-    NoizuTeams.Repo.all(query)
+    messages = NoizuTeams.Repo.all(query)
+    Enum.map(messages, fn(m) ->
+      IO.inspect(m, label: "------------------------------------MESSAGE")
+
+      s = NoizuTeams.Repo.get_by(NoizuTeams.Project.Member, project_id: channel.project_id, identifier: m.project_member_id)
+      case s.member_type do
+        :agent ->
+          a = NoizuTeams.Repo.get(NoizuTeams.Project.Agent, s.member_id)
+          %{m| sender: "🔮 #{a.name}"}
+        :user ->
+          a = NoizuTeams.Repo.get(NoizuTeams.User, s.member_id)
+          %{m| sender: "🧬 #{a.name}"}
+      end
+    end)
   end
 
   def entity(subject, context \\ nil)
