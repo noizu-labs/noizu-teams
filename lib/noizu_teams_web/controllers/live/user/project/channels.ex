@@ -14,6 +14,7 @@ defmodule NoizuTeamsWeb.User.Project.Channels do
         <%= render_channel(channel) %>
       <% end %>
     </ul>
+    <div class="mx-auto">Find/Search</div>
     </div>
     """
   end
