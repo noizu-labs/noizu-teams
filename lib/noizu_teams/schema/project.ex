@@ -142,6 +142,11 @@ defmodule NoizuTeams.Project do
     end
   end
   def entity(%__MODULE__{} = this, _), do: {:ok, this}
+  def entity(uuid, _) when is_bitstring(uuid) do
+    with %__MODULE__{} = this <- NoizuTeams.Repo.get(__MODULE__, uuid) do
+      {:ok, this}
+    end
+  end
   def entity({:ref, __MODULE__, identifier}, _) do
     with %__MODULE__{} = this <- NoizuTeams.Repo.get(__MODULE__, identifier) do
       {:ok, this}
@@ -151,6 +156,9 @@ defmodule NoizuTeams.Project do
     {:error, :not_found}
   end
 
+  def ref(uuid) when is_bitstring(uuid) do
+    {:ok, {:ref, __MODULE__, uuid}}
+  end
   def ref(%__MODULE__{identifier: identifier}) do
     {:ok, {:ref, __MODULE__, identifier}}
   end

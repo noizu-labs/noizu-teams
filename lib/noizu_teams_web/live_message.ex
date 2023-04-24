@@ -5,6 +5,18 @@ defmodule NoizuTeamsWeb.LiveMessage do
 
   Record.defrecord(:live_pub, [subject: nil, instance: nil, event: nil, payload: nil])
 
+  def unsubscribe(live_pub(
+    subject: s_subject,
+    instance: s_instance,
+    event: s_event
+  ) ) do
+    key = [s_subject, s_instance, s_event]
+          |> Enum.map(&("#{&1 || "*"}"))
+          |> Enum.join(":")
+    Logger.warn("PUBSUB Unsubscribe: #{key}")
+    PubSub.unsubscribe(NoizuTeams.LiveView.Interop, key)
+  end
+
   def subscribe(live_pub(
     subject: s_subject,
     instance: s_instance,
