@@ -29,7 +29,19 @@ defmodule NoizuTeamsWeb.User.Project.Direct do
     """
   end
 
-  def handle_event("direct:change:" <> direct, form, socket) do
+
+  def mount(_params, session, socket) do
+    members = fetch_members(session["user"], session["project"])
+    user_member = NoizuTeams.Project.member(session["project"], session["user"]) |> ok?()
+    {:ok, assign(socket,
+      project: session["project"],
+      user: session["user"],
+      user_member: user_member,
+      members: members
+    )}
+  end
+
+  def handle_event("direct:change:" <> direct, _, socket) do
     # 1. Get members
     member_b = Enum.find(socket.assigns.members, &(&1.identifier == direct))
     member_a = socket.assigns.user_member
@@ -39,7 +51,7 @@ defmodule NoizuTeamsWeb.User.Project.Direct do
                         {:ok, channel}
                       else
                         _ ->
-                          {:ok, channel} = NoizuTeams.Project.Channel.add_direct_channel(socket.assigns.project, member_a, member_b)
+                          NoizuTeams.Project.Channel.add_direct_channel(socket.assigns.project, member_a, member_b)
                       end)
 
     # 3. Change Channel
@@ -53,17 +65,6 @@ defmodule NoizuTeamsWeb.User.Project.Direct do
     )
 
     {:noreply, socket}
-  end
-
-  def mount(_params, session, socket) do
-    members = fetch_members(session["user"], session["project"])
-    user_member = NoizuTeams.Project.member(session["project"], session["user"]) |> ok?()
-    {:ok, assign(socket,
-      project: session["project"],
-      user: session["user"],
-      user_member: user_member,
-      members: members
-    )}
   end
 
   def handle_event("direct:add", _, socket) do

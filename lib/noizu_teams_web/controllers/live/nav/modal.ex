@@ -95,16 +95,16 @@ defmodule NoizuTeamsWeb.Nav.Modal do
         NoizuTeamsWeb.LiveMessage.live_pub(
           subject: :modal,
           instance: instance,
-          event: :close, payload: modal) = _msg,
+          event: :close) = _msg,
         socket) do
     index = socket.assigns.modal_key[instance]
     socket = (if index do
                 modals = socket.assigns.modals
                 modals = put_in(modals, [Access.at(index), Access.key(:enabled)], false)
                 open = Enum.find(modals, fn(m) -> m.enabled == true end) && true || false
-                socket = socket
-                         |> assign(open: open)
-                         |> assign(modals: modals)
+                socket
+                |> assign(open: open)
+                |> assign(modals: modals)
               else
                 socket
               end)

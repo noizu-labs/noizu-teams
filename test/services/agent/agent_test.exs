@@ -1,6 +1,6 @@
 defmodule NoizuTeamsService.AgentTest do
   use ExUnit.Case, async: true
-
+  @moduletag component: :agents
   test "Parse Meta" do
     meta = """
     context:

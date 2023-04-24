@@ -3,7 +3,7 @@ defmodule NoizuTeamsWeb.LoginForm.Login do
   import NoizuTeamsWeb.Nav.Tags
 
   defp error_title(_error), do: "Login"
-  defp error_body(error) do
+  defp error_body(_error) do
     "An error has Occurred"
   end
 

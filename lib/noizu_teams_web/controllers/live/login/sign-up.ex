@@ -4,7 +4,7 @@ defmodule NoizuTeamsWeb.LoginForm.SignUp do
 
   defp error_title(_error), do: "Sign Up"
   defp error_body({:error, :user_exists}), do: "Account already exists"
-  defp error_body(error) do
+  defp error_body(_error) do
     "An error has Occurred"
   end
 

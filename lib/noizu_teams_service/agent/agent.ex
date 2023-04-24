@@ -1,16 +1,16 @@
 defmodule NoizuTeamsService.Agent do
   require NoizuTeamsWeb.LiveMessage
   require Logger
-  import NoizuLabs.EntityReference.Helpers
+  #import NoizuLabs.EntityReference.Helpers
   import Ecto.Query
 
-  def opinions(agent) do
+  def opinions(_) do
     {:ok, []}
   end
-  def observations(agent) do
+  def observations(_) do
     {:ok, []}
   end
-  def mind_reading(agent) do
+  def mind_reading(_) do
     {:ok, []}
   end
   def memory(:short_term, agent, sender) do
@@ -30,7 +30,7 @@ defmodule NoizuTeamsService.Agent do
     end)  |> IO.inspect(label: "SHORT TERM MEMORY")
     {:ok, r}
   end
-  def memory(:long_term, agent, sender) do
+  def memory(:long_term, _agent, _sender) do
     {:ok, []}
   end
 
@@ -112,7 +112,7 @@ defmodule NoizuTeamsService.Agent do
     {:ok, mind_reading} = mind_reading(agent.member)
     {:ok, st_memory} = memory(:short_term, agent, sender)
     {:ok, lt_memory} = memory(:long_term, agent, sender)
-    context = [
+    [
       id: agent.identifier,
       identity: agent.member.identity,
       purpose: agent.member.purpose,
@@ -157,10 +157,15 @@ defmodule NoizuTeamsService.Agent do
   def prepare_meta_prompt(agent, channel, sender, message, response) do
     mp = meta_prompt(agent, sender)
     context = [context: agent_context(agent, sender)]
+    channel_name = cond do
+      channel.channel_type == :direct -> "Direct"
+      :else -> channel.slug
+    end
     sm = [
       sender: [
         name: sender.member.name,
         id: sender.identifier,
+        channel: channel_name,
         message: message
       ]
     ]
@@ -184,10 +189,14 @@ defmodule NoizuTeamsService.Agent do
 
   def prepare_prompt(agent, channel, sender, message) do
     mp = master_prompt(agent, sender)
-
+    channel_name = cond do
+      channel.channel_type == :direct -> "Direct"
+      :else -> channel.slug
+    end
 
     m = [
       sender: [
+        channel: channel_name,
         name: sender.member.name,
         id: sender.identifier,
         message: message
@@ -277,7 +286,7 @@ defmodule NoizuTeamsService.Agent do
   def message(agent, channel, sender, message) do
       spawn fn ->
         messages = prepare_prompt(agent, channel, sender, message)
-        project = NoizuTeams.Project.entity(channel.project_id) |> ok?()
+        #project = NoizuTeams.Project.entity(channel.project_id) |> ok?()
 
         # 1. Emit typing event
         typing_event = %{

@@ -8,7 +8,7 @@ defmodule NoizuTeamsService.Channel do
   end
 
   def message_audience(project, channel, audience, message) do
-    recipients = case Regex.run(~r/@([a-z\-]*)/, message) do
+    case Regex.run(~r/@([a-z\-]*)/, message) do
       [_,"everyone"] ->
         NoizuTeams.Project.Channel.members(channel)
       [] ->
@@ -16,7 +16,6 @@ defmodule NoizuTeamsService.Channel do
       [_|t] when is_list(t) ->
         Enum.map(t, fn(slug) ->
           with {:ok, agent} <- NoizuTeams.Project.Agent.by_slug(project, slug) do
-            agent
             {:ok, member} = NoizuTeams.Project.member(project, agent)
             %{member| member: agent}
             else

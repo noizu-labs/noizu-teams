@@ -53,7 +53,7 @@ defmodule NoizuTeamsWeb.User.Project.Channels do
     {:noreply, socket}
   end
 
-  def handle_event("channel:change:" <> channel, form, socket) do
+  def handle_event("channel:change:" <> channel, _form, socket) do
     payload = %{
       project: {:ref,  NoizuTeams.Project, socket.assigns[:project].identifier},
       user: {:ref,  NoizuTeams.Project, socket.assigns[:user].identifier},

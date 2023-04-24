@@ -1,6 +1,6 @@
 defmodule NoizuTeamsWeb.Project.Channel do
   use NoizuTeamsWeb, :live_view
-  alias Phoenix.LiveView.JS
+  #alias Phoenix.LiveView.JS
   import NoizuLabs.EntityReference.Helpers
 
   require NoizuTeamsWeb.LiveMessage

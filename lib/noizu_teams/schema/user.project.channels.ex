@@ -1,7 +1,6 @@
 defmodule NoizuTeams.User.Project.Channel do
   use Ecto.Schema
   import Ecto.Changeset
-  import Ecto.Query
 
   @primary_key {:identifier, :binary_id, autogenerate: true}
   schema "user_project_channels" do
