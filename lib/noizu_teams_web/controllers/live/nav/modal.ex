@@ -57,23 +57,57 @@ defmodule NoizuTeamsWeb.Nav.Modal do
   def handle_info(
         NoizuTeamsWeb.LiveMessage.live_pub(
           subject: :modal,
-          instance: _key,
+          instance: instance,
           event: :launch, payload: modal) = _msg,
         socket) do
-    modals = socket.assigns.modals
-    index = length(modals)
-    modal_key = socket.assigns.modal_key
-                |> put_in([Access.key(modal.identifier)], index)
 
-    Logger.error("START MODAL\n #{inspect modal, limit: :infinity}")
+    if index = socket.assigns.modal_key[instance] do
+      modals = socket.assigns.modals
+      modals = put_in(modals, [Access.at(index), Access.key(:enabled)], true)
+      socket = socket
+               |> assign(open: true)
+               |> assign(modals: modals)
+      {:noreply, socket}
+    else
+      modals = socket.assigns.modals
+      index = length(modals)
+      modal_key = socket.assigns.modal_key
+                  |> put_in([Access.key(modal.identifier)], index)
 
-    modal = modal
-            |> put_in([Access.key(:enabled)], true)
-    modals = (modals ++ [modal])
-    socket = socket
-             |> assign(open: true)
-             |> assign(modals: modals)
-             |> assign(modal_key: modal_key)
+      Logger.error("START MODAL\n #{inspect modal, limit: :infinity}")
+
+      modal = modal
+              |> put_in([Access.key(:enabled)], true)
+      modals = (modals ++ [modal])
+      socket = socket
+               |> assign(open: true)
+               |> assign(modals: modals)
+               |> assign(modal_key: modal_key)
+      {:noreply, socket}
+    end
+
+
+  end
+
+
+
+  def handle_info(
+        NoizuTeamsWeb.LiveMessage.live_pub(
+          subject: :modal,
+          instance: instance,
+          event: :close, payload: modal) = _msg,
+        socket) do
+    index = socket.assigns.modal_key[instance]
+    socket = (if index do
+                modals = socket.assigns.modals
+                modals = put_in(modals, [Access.at(index), Access.key(:enabled)], false)
+                open = Enum.find(modals, fn(m) -> m.enabled == true end) && true || false
+                socket = socket
+                         |> assign(open: open)
+                         |> assign(modals: modals)
+              else
+                socket
+              end)
     {:noreply, socket}
   end
 

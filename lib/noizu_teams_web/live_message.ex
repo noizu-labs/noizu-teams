@@ -13,7 +13,7 @@ defmodule NoizuTeamsWeb.LiveMessage do
     key = [s_subject, s_instance, s_event]
           |> Enum.map(&("#{&1 || "*"}"))
           |> Enum.join(":")
-    Logger.warn("PUBSUB Unsubscribe: #{key}")
+    #Logger.warn("PUBSUB Unsubscribe: #{key}")
     PubSub.unsubscribe(NoizuTeams.LiveView.Interop, key)
   end
 
@@ -25,7 +25,7 @@ defmodule NoizuTeamsWeb.LiveMessage do
     key = [s_subject, s_instance, s_event]
           |> Enum.map(&("#{&1 || "*"}"))
           |> Enum.join(":")
-    Logger.warn("PUBSUB Subscribe: #{key}")
+    #Logger.warn("PUBSUB Subscribe: #{key}")
     PubSub.subscribe(NoizuTeams.LiveView.Interop, key)
   end
 
@@ -45,7 +45,7 @@ defmodule NoizuTeamsWeb.LiveMessage do
       "#{s_subject}:#{s_instance}:#{s_event}",
       "#{s_subject}:*:#{s_event}",
     ]
-    Logger.info("PUB-SUB-EMIT: #{inspect keys} -> #{inspect msg}")
+    #Logger.info("PUB-SUB-EMIT: #{inspect keys} -> #{inspect msg}")
     Enum.map(keys, fn(key) ->
       PubSub.broadcast(
         NoizuTeams.LiveView.Interop,

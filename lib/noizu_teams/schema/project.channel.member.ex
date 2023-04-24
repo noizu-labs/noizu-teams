@@ -6,6 +6,7 @@ defmodule NoizuTeams.Project.Channel.Member do
   schema "project_channel_members" do
     field :channel_id, Ecto.UUID
     field :project_member_id, Ecto.UUID
+    field :member, :map, virtual: true
     field :joined_on, :utc_datetime_usec
   end
 

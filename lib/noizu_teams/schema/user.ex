@@ -12,7 +12,7 @@ defmodule NoizuTeams.User do
     field :status, NoizuTeams.AccountStatusEnum
 
     field :slug, :string
-
+    field :member, :map, virtual: true
     field :email, :string
     field :login_name, :string
 
@@ -124,28 +124,28 @@ defmodule NoizuTeams.User do
         joined_on: DateTime.utc_now(),
       })
 
-      # Join public channels
-      now = DateTime.utc_now()
-      with {:ok, channels} <- NoizuTeams.Project.channels(project) do
-        Enum.map(channels, fn(channel) ->
-          %NoizuTeams.Project.Channel.Member{
-            channel_id: channel.identifier,
-            project_member_id: member.identifier,
-            joined_on: now,
-          } |> Repo.insert()
-
-          %NoizuTeams.User.Project.Channel{
-            channel_id: channel.identifier,
-            project_id: project.identifier,
-            user_id: user.identifier,
-            starred: false,
-            joined_on: now,
-          } |> Repo.insert()
-        end)
-
-
-
-      end
+#      # Join public channels
+#      now = DateTime.utc_now()
+#      with {:ok, channels} <- NoizuTeams.Project.channels(project) do
+#        Enum.map(channels, fn(channel) ->
+#          %NoizuTeams.Project.Channel.Member{
+#            channel_id: channel.identifier,
+#            project_member_id: member.identifier,
+#            joined_on: now,
+#          } |> Repo.insert()
+#
+#          %NoizuTeams.User.Project.Channel{
+#            channel_id: channel.identifier,
+#            project_id: project.identifier,
+#            user_id: user.identifier,
+#            starred: false,
+#            joined_on: now,
+#          } |> Repo.insert()
+#        end)
+#
+#
+#
+#      end
 
       {:ok, member}
     end

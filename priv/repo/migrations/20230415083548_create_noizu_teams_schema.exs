@@ -8,9 +8,11 @@ defmodule NoizuTeams.Repo.Migrations.CreateNoizuTeamsSchema do
     execute("CREATE TYPE team_role_enum AS ENUM ('owner', 'admin', 'member', 'limited', 'deactivated', 'pending')")
     execute("CREATE TYPE client_type_enum AS ENUM ('ios', 'android', 'web', 'app')")
     execute("CREATE TYPE member_type_enum AS ENUM ('user', 'agent', 'tool', 'extension')")
+    execute("CREATE TYPE channel_type_enum AS ENUM ('chat', 'direct', 'group')")
   end
 
   def down do
+    execute("DROP TYPE channel_type_enum")
     execute("DROP TYPE account_status_enum")
     execute("DROP TYPE team_role_enum")
     execute("DROP TYPE client_type_enum")

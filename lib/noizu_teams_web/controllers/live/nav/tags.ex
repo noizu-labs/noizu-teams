@@ -83,7 +83,7 @@ defmodule NoizuTeamsWeb.Nav.Tags do
   attr :modal, :map, default: false
   def modal_queue_entry(assigns) do
     ~H"""
-          <div class={ modal_container_classes(@modal) }>
+          <div :if={@modal.enabled} class={ modal_container_classes(@modal) }>
             <div class="modal-mask"></div>
             <div class={ modal_classes(@modal) } >
               <div class="modal-header"><%= @modal.title %></div>

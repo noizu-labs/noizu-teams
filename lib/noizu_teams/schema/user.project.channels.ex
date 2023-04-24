@@ -21,15 +21,5 @@ defmodule NoizuTeams.User.Project.Channel do
     |> validate_required([:project_id, :user_id, :channel_id, :starred, :joined_on])
   end
 
-  def user_channels(user, project) do
-    query = from upc in NoizuTeams.User.Project.Channel,
-            where: upc.project_id == ^project.identifier,
-            where: upc.user_id == ^user.identifier,
-            join: c in NoizuTeams.Project.Channel,
-            on: c.identifier == upc.channel_id,
-            select: %{upc| channel: c}
-     r = NoizuTeams.Repo.all(query)
-    {:ok, r}
-  end
 
 end

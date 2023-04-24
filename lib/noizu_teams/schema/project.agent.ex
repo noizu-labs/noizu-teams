@@ -10,9 +10,12 @@ defmodule NoizuTeams.Project.Agent do
     field :name, :string
     field :slug, :string
     field :description, :string
-    field :prompt, :string
-    field :team_prompt, :string, virtual: true
 
+    field :identity, :string
+    field :purpose, :string
+    field :self_image, :string
+    field :mood, :string
+    
     field :status, NoizuTeams.AccountStatusEnum
     field :team_status, NoizuTeams.AccountStatusEnum, virtual: true
 

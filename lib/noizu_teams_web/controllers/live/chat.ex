@@ -7,10 +7,25 @@ defmodule NoizuTeamsWeb.ChatLive do
     ~H"""
     <div class="h-full flex flex-col">
       <div class="bg-white rounded-lg shadow p-4 flex-1 mb-4 overflow-y-auto">
-        <h2 class="mb-4"><span class="text-lg font-bold">#<%= @channel.slug %></span> <%= @channel.name %></h2>
+
+      <h2 class="mb-4">
+          <span :if={@channel.channel_type == :direct}>
+            Direct Message: <span  :for={member <- @members}>
+      <span class="mr-2" :if={member.identifier != @user.member.identifier }>
+    <span :if={member.member_type == :user}>🧬 <%= member.member.name %></span>
+    <span :if={member.member_type == :agent}>🔮 <%= member.member.name %></span>
+    </span>
+              </span>
+          </span>
+          <span :if={@channel.channel_type == :chat}>
+            <span class="text-lg font-bold">#<%= @channel.slug %></span> <%= @channel.name %>
+          </span>
+
+
+      </h2>
 
         <%= for message <- @messages do %>
-          <%= render_message(@member, message, assigns) %>
+          <%= render_message(@user.member, message, assigns) %>
         <% end %>
 
         <%= for {_, typing} <- @typing do %>
@@ -86,16 +101,18 @@ defmodule NoizuTeamsWeb.ChatLive do
       NoizuTeamsWeb.LiveMessage.live_pub(subject: :project, instance: :active, event: :change_channel)
     )
     update_subscriptions(nil, session["channel"])
-
-    {:ok, member_id} = NoizuTeams.Project.user_member_id(session["project"], session["user"])
+    members = NoizuTeams.Project.Channel.members(session["channel"])
+    user = session["user"]
+    {:ok, member} = NoizuTeams.Project.member(session["project"], user)
+    user = %{user| member: member}
 
     {:ok, assign(socket,
-      user: session["user"],
+      user: user,
       project: session["project"],
       channel: session["channel"],
       typing: %{},
       audience: nil,
-      member: member_id,
+      members: members,
       messages: messages
     )}
   end
@@ -127,7 +144,7 @@ defmodule NoizuTeamsWeb.ChatLive do
 
     socket = case payload.event do
       v when v in [:typing] ->
-        Logger.error("TYPING UPDATE: #{inspect payload}")
+        #Logger.error("TYPING UPDATE: #{inspect payload.status}")
         typing = socket.assigns.typing
                  |> put_in([payload.member.identifier], payload.status)
         socket
@@ -147,16 +164,22 @@ defmodule NoizuTeamsWeb.ChatLive do
         socket) do
     previous_channel = socket.assigns.channel
     channel = ERP.entity(payload.channel, nil) |> ok?()
+    members = NoizuTeams.Project.Channel.members(channel)
     socket = socket
-             |> assign(channel: channel,
-                  messages: fetch_messages(channel))
+             |> assign(
+                  channel: channel,
+                  members: members,
+                  messages: fetch_messages(channel)
+                )
     update_subscriptions(previous_channel, channel)
     {:noreply, socket}
   end
 
 
   def handle_event("send", %{"message" => message}, socket) do
-    {:ok, audience} = NoizuTeamsService.Channel.send(socket.assigns.channel, socket.assigns.member,  socket.assigns.audience, message)
+    sender = socket.assigns.user.member
+             |> put_in([Access.key(:member)], %{socket.assigns.user| member: nil})
+    {:ok, audience} = NoizuTeamsService.Channel.send(socket.assigns.channel, sender,  socket.assigns.audience, message)
     socket = socket
              |> assign(audience: audience)
     {:noreply, socket}

@@ -18,8 +18,8 @@ defmodule NoizuTeams.MixProject do
   # Type `mix help compile.app` for more information.
   def application do
     [
-      mod: {NoizuTeams.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      mod: {NoizuTeams.Application, [ ]},
+      extra_applications: [:logger, :runtime_tools,  :finch, :jason,]
     ]
   end
 
@@ -58,9 +58,12 @@ defmodule NoizuTeams.MixProject do
       {:ueberauth, "~> 0.10.5"},
       {:guardian, "~> 2.3.1"},
       {:poison, "~> 3.1.0"},
+      {:noizu_labs_open_ai, path: "elixir-framework/apps/noizu_labs_open_ai"},
       {:redix, "~> 1.1"},
-      {:noizu_openai, path: "elixir-framework/libs/elixir-openai"},
-      {:noizu_labs_erp, path: "elixir-framework/libs/noizu_labs_erp"},
+      {:noizu_labs_erp, path: "elixir-framework/apps/noizu_labs_erp"},
+
+
+      {:fast_yaml, "~> 1.0.36"},
       {:ex_fixer, github: "noizu/ex_fixer", branch: "master", only: [:dev, :test]},
       # Discord  https://blog.discordapp.com/scaling-elixir-f9b8e1e7c29b
       {:fastglobal, "~> 1.0"}, # https://github.com/discordapp/fastglobal

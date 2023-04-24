@@ -34,7 +34,12 @@ defmodule NoizuTeams.Repo.Migrations.CreateProject do
       add :name, :string, null: false
       add :slug, :string, null: false
       add :description, :string, null: false
-      add :prompt, :text, null: false
+
+      add :identity, :string, null: false
+      add :purpose, :string, null: false
+      add :self_image, :string, null: false
+      add :mood, :string, null: false
+
 
       add :status, :account_status_enum, null: false
 
@@ -43,13 +48,66 @@ defmodule NoizuTeams.Repo.Migrations.CreateProject do
       add :deleted_on, :utc_datetime_usec
     end
 
+    create table(:project_agent_memories, primary_key: false) do
+      add :identifier, :uuid, primary_key: true
+      add :agent_id, :uuid, null: false
+
+      add :subject, :string, null: false
+      add :topic, :string, null: false
+      add :memory, :string, null: false
+
+      add :created_on, :utc_datetime_usec, null: false
+      add :modified_on, :utc_datetime_usec, null: false
+      add :deleted_on, :utc_datetime_usec
+    end
+
+    create table(:project_agent_mind_readings, primary_key: false) do
+      add :identifier, :uuid, primary_key: true
+      add :agent_id, :uuid, null: false
+
+      add :subject, :string, null: false
+      add :observation, :string, null: false
+
+      add :created_on, :utc_datetime_usec, null: false
+      add :modified_on, :utc_datetime_usec, null: false
+      add :deleted_on, :utc_datetime_usec
+    end
+
+
+    create table(:project_agent_observations, primary_key: false) do
+      add :identifier, :uuid, primary_key: true
+      add :agent_id, :uuid, null: false
+
+      add :context, :string, null: false
+      add :observation, :string, null: false
+
+      add :created_on, :utc_datetime_usec, null: false
+      add :modified_on, :utc_datetime_usec, null: false
+      add :deleted_on, :utc_datetime_usec
+    end
+
+    create table(:project_agent_opinions, primary_key: false) do
+      add :identifier, :uuid, primary_key: true
+      add :agent_id, :uuid, null: false
+
+      add :context, :string, null: false
+      add :observation, :string, null: false
+
+      add :created_on, :utc_datetime_usec, null: false
+      add :modified_on, :utc_datetime_usec, null: false
+      add :deleted_on, :utc_datetime_usec
+    end
+
+
+
     create table(:project_channels, primary_key: false) do
       add :identifier, :uuid, primary_key: true
       add :project_id, :uuid, null: false
-      add :slug, :string, null: false
+      add :channel_type, :channel_type_enum, null: false
+      add :slug, :string, null: true
       add :private, :boolean, null: false, default: false
       add :name, :string, null: false
-      add :description, :string, null: false
+      add :description, :string, null: true
 
       add :created_on, :utc_datetime_usec, null: false
       add :modified_on, :utc_datetime_usec, null: false
@@ -98,6 +156,10 @@ defmodule NoizuTeams.Repo.Migrations.CreateProject do
     drop table(:user_project_channels)
     drop table(:project_channel_members)
     drop table(:project_channels)
+    drop table(:project_agent_opinions)
+    drop table(:project_agent_observations)
+    drop table(:project_agent_mind_readings)
+    drop table(:project_agent_memories)
     drop table(:project_agents)
     drop table(:project_members)
     drop table(:projects)

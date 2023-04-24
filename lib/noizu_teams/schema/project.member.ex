@@ -9,6 +9,7 @@ defmodule NoizuTeams.Project.Member do
     field :member_id, Ecto.UUID
     field :project_id, Ecto.UUID
 
+    field :member, :map, virtual: true
     field :name, :string, virtual: true
     field :slug, :string, virtual: true
 
