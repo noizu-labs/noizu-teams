@@ -1,20 +1,18 @@
 defmodule NoizuTeamsWeb.PubSub.Manager do
   use NoizuTeamsWeb, :live_view
-  import Phoenix.LiveView.JS
-  import NoizuTeamsWeb.Nav.Tags
   require Logger
-
-  defp error_title(error), do: "Team Member"
-  defp error_body(error) do
-    "An error has Occurred"
-  end
+#
+#  defp error_title(_error), do: "Team Member"
+#  defp error_body(_error) do
+#    "An error has Occurred"
+#  end
 
   def render(assigns) do
     ~H"""
     <div id="team-members" phx-hook="phx:team1234">
 
       [ <%= @project %> : <%= @team %> ]
-      <div :for={member <- @team_members}>
+      <div :for={_member <- @team_members}>
       TEAM MEMBER
       </div>
     </div>

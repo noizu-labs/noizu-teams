@@ -2,12 +2,9 @@ defmodule NoizuTeamsWeb.LoginForm.SignUp do
   use NoizuTeamsWeb, :live_component
   import NoizuTeamsWeb.Nav.Tags
 
-  defp wrap_error(error), do: {:error, {:signup, error}}
-
-  defp error_title(error), do: "Sign Up"
+  defp error_title(_error), do: "Sign Up"
   defp error_body({:error, :user_exists}), do: "Account already exists"
   defp error_body(error) do
-    IO.inspect error, label: "ERROR TUPLE"
     "An error has Occurred"
   end
 

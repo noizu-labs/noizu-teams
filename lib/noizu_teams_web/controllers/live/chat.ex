@@ -106,7 +106,7 @@ defmodule NoizuTeamsWeb.ChatLive do
         <h2 class="mb-4"><span class="text-lg font-bold">#<%= @channel.slug %></span> <%= @channel.name %></h2>
 
         <%= for message <- @messages do %>
-          <%= render_message(@member, message) %>
+          <%= render_message(@member, message, assigns) %>
         <% end %>
 
       </div>
@@ -120,26 +120,30 @@ defmodule NoizuTeamsWeb.ChatLive do
     """
   end
 
-  defp render_message(member, assigns) do
+  defp render_message(member, message, assigns) do
+    assigns = assigns
+              |> assign(:message, message)
+              |> assign(:member, member)
+
     ~H"""
-    <div :if={member.identifier == @project_member_id}  class="flex flex-col space-y-1 mb-2">
+    <div :if={@member.identifier == @message.project_member_id}  class="flex flex-col space-y-1 mb-2">
                             <div class="bg-gray-200 dark:bg-blue-700  rounded-tl-lg rounded-tr-lg rounded-br-lg py-2 px-4">
                               <div class="markdown-body bg-inherit">
-                                <%= raw(Earmark.as_html!(@message)) %>
+                                <%= raw(Earmark.as_html!(@message.message)) %>
                               </div>
                             </div>
                             <div class="text-gray-500 text-xs">
-                                <%= @created_on %>
+                                <%= @message.created_on %>
                             </div>
                         </div>
-    <div :if={member.identifier != @project_member_id}  class="flex flex-col space-y-1 mb-2">
+    <div :if={@member.identifier != @message.project_member_id}  class="flex flex-col space-y-1 mb-2">
                             <div class="bg-gray-200 dark:bg-green-700 rounded-tl-lg rounded-tr-lg rounded-bl-lg py-2 px-4">
                               <div class="markdown-body">
-                                <%= raw(Earmark.as_html!(@message)) %>
+                                <%= raw(Earmark.as_html!(@message.message)) %>
                               </div>
                             </div>
                             <div class="text-gray-500 text-xs text-right">
-                                <%= @sender %>, <%= @created_on %>
+                                <%= @message.sender %>, <%= @message.created_on %>
                             </div>
                         </div>
     """
@@ -210,7 +214,7 @@ defmodule NoizuTeamsWeb.ChatLive do
            }  |> NoizuTeams.Repo.insert()
 
     # determine recipient
-    recipients = case Regex.run(~r/@([a-z\-]*)/, message) |> IO.inspect(label: "*************RECIPIENT*****************") do
+    recipients = case Regex.run(~r/@([a-z\-]*)/, message) do
       [_,"everyone"] ->
         IO.puts "HERE"
         NoizuTeams.Project.Channel.members(socket.assigns.channel)
@@ -226,7 +230,7 @@ defmodule NoizuTeamsWeb.ChatLive do
         else
           NoizuTeams.Project.Channel.members(socket.assigns.channel)
         end
-    end  |> IO.inspect(label: "*************RECIPIENT*****************")
+    end
 
     Enum.map(recipients, fn(recipient) ->
       spawn fn ->
@@ -238,7 +242,7 @@ defmodule NoizuTeamsWeb.ChatLive do
             %{role: "user", content: agent.prompt <> "\n[SYSTEM] respond as this agent for the rest of the conversation."},
             %{role: "user", content: message}
           ]
-          with {:ok, response} <- NoizuLabs.OpenAI.chat(messages) |> IO.inspect(label: "API Response") do
+          with {:ok, response} <- NoizuLabs.OpenAI.chat(messages) do
             response = get_in(response, [:choices, Access.at(0), :message, :content])
             #msg = %{author: "Grace", content: get_in(response, [:choices, Access.at(0), :message, :content])}
 
@@ -277,6 +281,6 @@ defmodule NoizuTeamsWeb.ChatLive do
   end
 
   defp fetch_messages(channel) do
-    NoizuTeams.Project.Channel.messages(channel) |> IO.inspect(label: "Messages")
+    NoizuTeams.Project.Channel.messages(channel)
   end
 end

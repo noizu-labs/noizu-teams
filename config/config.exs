@@ -8,6 +8,7 @@
 import Config
 import_config "utils/environment.exs"
 
+
 config :noizu_teams, NoizuTeamsWeb.Guardian,
        issuer: "noizu_teams",
        secret_key: "lIf077euUjrkZiNKBnprpmkogsWDIrDWJZ7UakAOhNsRgje+ko7Xmk5uJbKFGdNv"
@@ -66,6 +67,9 @@ config :logger, :console,
 
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
+
+
+import_config "config.core.exs"
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

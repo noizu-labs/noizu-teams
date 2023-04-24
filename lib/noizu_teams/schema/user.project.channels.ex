@@ -28,7 +28,7 @@ defmodule NoizuTeams.User.Project.Channel do
             join: c in NoizuTeams.Project.Channel,
             on: c.identifier == upc.channel_id,
             select: %{upc| channel: c}
-     r = NoizuTeams.Repo.all(query) |> IO.inspect(label: "CHANNEL QUERY")
+     r = NoizuTeams.Repo.all(query)
     {:ok, r}
   end
 

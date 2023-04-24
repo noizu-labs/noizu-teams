@@ -21,6 +21,12 @@ defmodule NoizuTeamsWeb.Project.Tags do
    "spawn:edit:agent:modal:#{agent.identifier}"
   end
 
+  def render(assigns) do
+    ~H"""
+
+    """
+  end
+
   def agent(assigns) do
     ~H"""
     <div class="

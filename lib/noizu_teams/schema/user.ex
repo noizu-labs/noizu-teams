@@ -37,6 +37,17 @@ defmodule NoizuTeams.User do
     {:ok, jwt}
   end
 
+  def entity(subject, context \\ nil)
+  def entity(%__MODULE__{} = this, _), do: {:ok, this}
+  def entity({:ref, __MODULE__, identifier}, _) do
+    with %__MODULE__{} = this <- NoizuTeams.Repo.get(__MODULE__, identifier) do
+      {:ok, this}
+    end
+  end
+  def entity(_, _) do
+    {:error, :not_found}
+  end
+
   def ref(%__MODULE__{identifier: identifier}) do
     {:ok, {:ref, __MODULE__, identifier}}
   end
@@ -79,7 +90,7 @@ defmodule NoizuTeams.User do
   Need to deal with uniqueness.
   """
   def slugify_name(name, attempts \\ nil)
-  def slugify_name(name, 0), do: {:error, :slug_error}
+  def slugify_name(_name, 0), do: {:error, :slug_error}
   def slugify_name(name, attempts) do
     suffix = cond do
       attempts == nil -> ""
@@ -102,7 +113,7 @@ defmodule NoizuTeams.User do
     end
   end
 
-  def join_project(user, nil), do: nil
+  def join_project(_user, nil), do: nil
   def join_project(user, {:subdomain, subdomain}) do
     with %NoizuTeams.Project{} = project <- NoizuTeams.Repo.get_by(NoizuTeams.Project, subdomain: subdomain) do
       {:ok, member} = Repo.insert(%NoizuTeams.Project.Member{
@@ -115,7 +126,7 @@ defmodule NoizuTeams.User do
 
       # Join public channels
       now = DateTime.utc_now()
-      with {:ok, channels} <- NoizuTeams.Project.channels(project) |> IO.inspect(label: "PROJECT CHANNELS") do
+      with {:ok, channels} <- NoizuTeams.Project.channels(project) do
         Enum.map(channels, fn(channel) ->
           %NoizuTeams.Project.Channel.Member{
             channel_id: channel.identifier,
@@ -162,7 +173,7 @@ defmodule NoizuTeams.User do
             status: :enabled,
             created_on: DateTime.utc_now(),
             modified_on: DateTime.utc_now(),
-          }) |> IO.inspect(label: "Change Set")
+          })
           with {:ok, user} <- Repo.insert(changeset),
                {:ok, _} <- Repo.insert(%User.Credential.Password{
                  user_id: user.identifier,

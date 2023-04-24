@@ -8,10 +8,10 @@ defmodule NoizuTeamsWeb.Project.TeamMembers do
   require Logger
   require NoizuTeamsWeb.LiveMessage
 
-  defp error_title(_error), do: "Team Member"
-  defp error_body(_error) do
-    "An error has Occurred"
-  end
+#  defp error_title(_error), do: "Team Member"
+#  defp error_body(_error) do
+#    "An error has Occurred"
+#  end
 
   def render(assigns) do
     ~H"""
@@ -28,7 +28,7 @@ defmodule NoizuTeamsWeb.Project.TeamMembers do
 
 
 
-  def agent_edit_modal(modal_key, socket, agent) do
+  def agent_edit_modal(modal_key, _socket, agent) do
     agent_session = %{
       "agent_id" =>  ERP.ref(agent) |> ok?
     }

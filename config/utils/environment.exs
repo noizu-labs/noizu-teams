@@ -1,4 +1,3 @@
-IO.puts "LOADED"
 defmodule NoizuTeams.Config.ConfigUtils do
   @prefix %{
     prod: "NT_PROD",

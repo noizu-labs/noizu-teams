@@ -44,8 +44,6 @@ defmodule NoizuTeams.Project.Channel do
             select: m
     messages = NoizuTeams.Repo.all(query)
     Enum.map(messages, fn(m) ->
-      IO.inspect(m, label: "------------------------------------MESSAGE")
-
       s = NoizuTeams.Repo.get_by(NoizuTeams.Project.Member, project_id: channel.project_id, identifier: m.project_member_id)
       case s.member_type do
         :agent ->

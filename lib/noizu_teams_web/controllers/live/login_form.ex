@@ -80,29 +80,29 @@ defmodule NoizuTeamsWeb.LoginForm do
           |> assign(signup: %{error: nil, form: nil})
         else
           e = {:error, _} ->
-            socket = socket
-                     |> assign(
-                          login: %{
-                            error: e,
-                            form: form
-                          })
+            socket
+            |> assign(
+                 login: %{
+                   error: e,
+                   form: form
+                 })
           e ->
-            socket = socket
-                     |> assign(
-                          login: %{
-                            error: {:error, e},
-                            form: form
-                          })
+            socket
+            |> assign(
+                 login: %{
+                   error: {:error, e},
+                   form: form
+                 })
         end
 
-      e = {:error, error_msg} ->
+      e = {:error, _error_msg} ->
         # Handle sign-up failure
-        socket = socket
-                 |> assign(
-                      login: %{
-                        error: e,
-                        form: form
-                      })
+        socket
+        |> assign(
+             login: %{
+               error: e,
+               form: form
+             })
     end
     {:noreply, socket}
   end
@@ -119,20 +119,20 @@ defmodule NoizuTeamsWeb.LoginForm do
           |> assign(signup: %{error: nil, form: nil})
         else
           _ ->
-            socket = socket
-                     |> assign(
-                          signup: %{
-                            error: {:error, :sign_up_error},
-                            form: form
-                          })
+            socket
+            |> assign(
+                 signup: %{
+                   error: {:error, :sign_up_error},
+                   form: form
+                 })
         end
-      e = {:error, error_msg} ->
-        socket = socket
-                 |> assign(
-                      signup: %{
-                        error: e,
-                        form: form
-                      })
+      e = {:error, _error_msg} ->
+        socket
+        |> assign(
+             signup: %{
+               error: e,
+               form: form
+             })
     end
     {:noreply, socket}
   end

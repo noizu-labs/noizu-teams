@@ -8,7 +8,7 @@ defmodule NoizuTeamsWeb.LiveMessage do
   def subscribe(live_pub(
     subject: s_subject,
     instance: s_instance,
-    event: s_event,
+    event: s_event
   ) ) do
     key = [s_subject, s_instance, s_event]
           |> Enum.map(&("#{&1 || "*"}"))
@@ -21,7 +21,7 @@ defmodule NoizuTeamsWeb.LiveMessage do
     subject: s_subject,
     instance: s_instance,
     event: s_event,
-    payload: payload
+    payload: _payload
   ) = msg) do
 
     # This is super inefficient, better routing will be needed in the future.

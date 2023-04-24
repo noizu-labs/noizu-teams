@@ -72,6 +72,13 @@ defmodule NoizuTeamsWeb.Nav.Tags do
     Enum.join(classes, " ")
   end
 
+  def render(assigns) do
+    ~H"""
+
+    """
+  end
+
+  attr :id, :string
   attr :socket, :map, default: false
   attr :modal, :map, default: false
   def modal_queue_entry(assigns) do

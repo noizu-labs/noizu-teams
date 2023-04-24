@@ -1,14 +1,12 @@
 defmodule NoizuTeamsWeb.Project.TeamSelector do
   use NoizuTeamsWeb, :live_view
   import NoizuLabs.EntityReference.Helpers
-  import Phoenix.LiveView.JS
   import NoizuTeamsWeb.Nav.Tags
   require Logger
   require NoizuTeamsWeb.LiveMessage
-  alias  Phoenix.PubSub
 
-  defp error_title(error), do: "Team Selector"
-  defp error_body(error) do
+  defp error_title(_error), do: "Team Selector"
+  defp error_body(_error) do
     "An error has Occurred"
   end
 

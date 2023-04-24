@@ -1,7 +1,5 @@
 defmodule NoizuTeamsWeb.Nav.Modal do
   use NoizuTeamsWeb, :live_view
-  import NoizuLabs.EntityReference.Helpers
-  import Phoenix.LiveView.JS
   import NoizuTeamsWeb.Nav.Tags
   require Logger
   require NoizuTeamsWeb.LiveMessage
@@ -59,8 +57,8 @@ defmodule NoizuTeamsWeb.Nav.Modal do
   def handle_info(
         NoizuTeamsWeb.LiveMessage.live_pub(
           subject: :modal,
-          instance: key,
-          event: :launch, payload: modal) = msg,
+          instance: _key,
+          event: :launch, payload: modal) = _msg,
         socket) do
     modals = socket.assigns.modals
     index = length(modals)

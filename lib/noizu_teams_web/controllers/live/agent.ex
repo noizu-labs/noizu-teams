@@ -14,12 +14,12 @@ defmodule NoizuTeamsWeb.AgentLive do
   end
 
 
-
-  def handle_event("spawn:edit:agent:modal:" <> _slug, _, socket) do
-    # Recursive and unnecessary but leaving in for testing stacked modals
-    NoizuTeamsWeb.Project.TeamMembers.agent_edit_modal("nested-edit-#{socket.assigns[:agent].slug}", socket, socket.assigns[:agent])
-    {:noreply, socket}
-  end
+#
+#  def handle_event("spawn:edit:agent:modal:" <> _slug, _, socket) do
+#    # Recursive and unnecessary but leaving in for testing stacked modals
+#    NoizuTeamsWeb.Project.TeamMembers.agent_edit_modal("nested-edit-#{socket.assigns[:agent].slug}", socket, socket.assigns[:agent])
+#    {:noreply, socket}
+#  end
 
 
   defp fetch_agent(agent_id) do

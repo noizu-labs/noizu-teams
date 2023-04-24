@@ -1,7 +1,6 @@
 defmodule NoizuTeamsWeb.User.Project.Channels do
   use NoizuTeamsWeb, :live_view
-  import NoizuTeamsWeb.LiveMessage
-
+  require NoizuTeamsWeb.LiveMessage
 
   def render(assigns) do
     ~H"""
@@ -33,7 +32,6 @@ defmodule NoizuTeamsWeb.User.Project.Channels do
 
 
   def handle_event("channel:change:" <> channel, form, socket) do
-    IO.inspect(form, label: "SELECT CHANNEL")
     payload = %{
       project: {:ref,  NoizuTeams.Project, socket.assigns[:project].identifier},
       user: {:ref,  NoizuTeams.Project, socket.assigns[:user].identifier},
@@ -51,6 +49,6 @@ defmodule NoizuTeamsWeb.User.Project.Channels do
       channels
     else
       _ -> []
-    end |> IO.inspect(label: "CHANNELS")
+    end
   end
 end

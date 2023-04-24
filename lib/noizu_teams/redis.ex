@@ -8,7 +8,7 @@ defmodule NoizuTeams.Redis do
     # Specs for the Redix connections.
     v = Application.get_env(:noizu_teams, :redis)
     uri = v[:uri] || v[:host]
-    settings = Redix.URI.opts_from_uri(uri)
+    settings = Redix.URI.to_start_options(uri)
     children = Enum.map(
       1..@pool_size,
       fn (index) ->

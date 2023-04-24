@@ -1,9 +1,8 @@
 defmodule NoizuTeamsWeb.PageController do
   use NoizuTeamsWeb, :controller
-  import NoizuLabs.EntityReference.Helpers
   require Logger
 
-  defp project(conn, params) do
+  defp project(conn, _params) do
     case String.split(conn.host, ".") do
       ["dev", "teams", "noizu", "com"] -> {:subdomain, "noizu"}
       ["dev", p, "teams", "noizu", "com"] -> {:subdomain, p}
@@ -17,7 +16,7 @@ defmodule NoizuTeamsWeb.PageController do
     with %NoizuTeams.User{} = user <- NoizuTeamsWeb.Guardian.Plug.current_resource(conn) do
       # Verify user has access to current project
 
-      with id = {:subdomain, slug} <- project(conn, params),
+      with id = {:subdomain, _slug} <- project(conn, params),
            {:ok, project} <- NoizuTeams.Project.entity(id),
            {:ok, project_membership} <- NoizuTeams.Project.membership(project, user),
            true <- project_membership.role not in [:deactivated, :pending],
@@ -60,7 +59,7 @@ defmodule NoizuTeamsWeb.PageController do
 
 
     else
-      e ->
+      _e ->
         # temp hardcode
         project_slug = project(conn, params)
         render(conn, :login, project: project_slug, layout: false)

@@ -23,26 +23,20 @@ defmodule NoizuTeams.Enum do
       def type, do: Ecto.Enum
 
       def cast(value) when is_bitstring(value) do
-        IO.puts "CAST: #{inspect value}"
         case from_string(value) do
           {:ok, result} -> {:ok, result}
           {:error, _} -> :error
           error ->
-            IO.inspect(error, label: "Error")
             :error
         end
       end
 
       def cast(value) when is_atom(value) do
-        IO.puts "CAST: #{inspect value}"
-
         case from_atom(value) do
           {:ok, result} -> {:ok, result}
           {:error, error} ->
-            IO.inspect(error, label: "Error")
             :error
           error ->
-            IO.inspect(error, label: "Error")
             :error
         end
       end
@@ -52,21 +46,18 @@ defmodule NoizuTeams.Enum do
       end
 
       def dump(value) when is_bitstring(value) do
-        IO.puts "DUMP: #{inspect value}"
+        #IO.puts "DUMP: #{inspect value}"
         case from_string(value) do
           {:ok, result} -> {:ok, Atom.to_string(result)}
           error ->
-            IO.inspect(error, label: "Error")
             error
         end
       end
 
       def dump(value) when is_atom(value) do
-        IO.puts "DUMP: #{inspect value}"
         case from_atom(value) do
           {:ok, result} -> {:ok, Atom.to_string(result)}
           error ->
-            IO.inspect(error, label: "Error")
             error
         end
       end

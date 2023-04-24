@@ -2,9 +2,8 @@ defmodule NoizuTeamsWeb.LoginForm.Login do
   use NoizuTeamsWeb, :live_component
   import NoizuTeamsWeb.Nav.Tags
 
-  defp error_title(error), do: "Login"
+  defp error_title(_error), do: "Login"
   defp error_body(error) do
-    IO.inspect error, label: "ERROR TUPLE"
     "An error has Occurred"
   end
 
