@@ -57,8 +57,14 @@ defmodule NoizuTeams.MixProject do
       {:elixir_uuid, "~> 1.2" },
       {:ueberauth, "~> 0.10.5"},
       {:guardian, "~> 2.3.1"},
+      {:poison, "~> 3.1.0"},
+      {:redix, "~> 1.1"},
       {:noizu_openai, path: "elixir-framework/libs/elixir-openai"},
       {:noizu_labs_erp, path: "elixir-framework/libs/noizu_labs_erp"},
+      {:ex_fixer, github: "noizu/ex_fixer", branch: "master", only: [:dev, :test]},
+      # Discord  https://blog.discordapp.com/scaling-elixir-f9b8e1e7c29b
+      {:fastglobal, "~> 1.0"}, # https://github.com/discordapp/fastglobal
+      {:semaphore, "~> 1.0"}, # https://github.com/discordapp/semaphore
     ]
   end
 

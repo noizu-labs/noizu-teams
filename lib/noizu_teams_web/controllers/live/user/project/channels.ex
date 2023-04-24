@@ -47,7 +47,7 @@ defmodule NoizuTeamsWeb.User.Project.Channels do
   end
 
   defp fetch_channels(user, project) do
-    with {:ok, channels} <- NoizuTeams.User.Project.Channel.user_channels(user, project) do
+    with {:ok, channels} <- NoizuTeamsService.Project.channels(project, user, nil) do
       channels
     else
       _ -> []
