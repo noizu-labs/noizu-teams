@@ -127,7 +127,8 @@ defmodule NoizuTeams.Project do
 #      {:ok, List.first(teams)}
 #    end
 #  end
-
+  def member(project, nil), do: {:error, :no_subject}
+  def member(project, %NoizuTeams.Project.Member{member: member}), do: member(project, member)
   def member(project, %NoizuTeams.Project.Agent{} = member) do
     with role = %NoizuTeams.Project.Member{} <- NoizuTeams.Repo.get_by(NoizuTeams.Project.Member, member_type: :agent, member_id: member.identifier, project_id: project.identifier) do
       {:ok, %{role| slug: member.slug}}

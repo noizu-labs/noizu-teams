@@ -12,6 +12,30 @@
         background-color: black;
     }
 
+    llm-fim {
+        @apply bg-slate-200 block items-center justify-center align-middle w-fit mx-auto flex flex-col;
+    }
+
+    llm-fim h2 {
+        @apply bg-slate-400 w-full h-full text-2xl text-black ;
+    }
+
+    llm-fim llm-fim-media {
+        @apply bg-white align-middle justify-center mx-auto w-fit;
+    }
+
+    llm-fim llm-fim-media svg {
+        @apply w-[1280px];
+    }
+
+    .show-context .msg-llm-context {
+        @apply visible bg-slate-200;
+    }
+
+    .hide-context .msg-llm-context {
+        @apply hidden bg-slate-200;
+    }
+
     /* Retain Spacing for sidebar to prevent flow flickers when enabled */
     .stable-gutter {
         scrollbar-gutter: stable;

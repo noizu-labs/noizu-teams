@@ -6,6 +6,8 @@ defmodule NoizuTeams.Project.Channel.Message do
   schema "project_channel_messages" do
     field :channel_id, Ecto.UUID
     field :project_member_id, Ecto.UUID
+    field :code, :map, virtual: true
+    field :llm_update, :string
     field :sender, :string, virtual: true
     field :message, :string
     field :created_on, :utc_datetime_usec
@@ -16,7 +18,7 @@ defmodule NoizuTeams.Project.Channel.Message do
   @doc false
   def changeset(team_agent, attrs) do
     team_agent
-    |> cast(attrs, [:channel_id, :project_member_id, :message, :created_on, :modified_on, :deleted_on])
+    |> cast(attrs, [:channel_id, :project_member_id, :message, :llm_update, :created_on, :modified_on, :deleted_on])
     |> validate_required([:channel_id, :project_member_id, :message, :created_on, :modified_on])
   end
 

@@ -87,7 +87,7 @@ defmodule NoizuTeams.Project.Channel do
                  on: h.identifier == pm.member_id,
                  select: %{pm| member: h}
     b = NoizuTeams.Repo.all(query)
-    a ++ b |> IO.inspect(label: "MEMBERS")
+    a ++ b
   end
 
   def messages(channel) do

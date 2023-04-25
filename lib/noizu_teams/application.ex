@@ -20,6 +20,9 @@ defmodule NoizuTeams.Application do
       {Finch, name: NoizuLabs.OpenAI.Finch},
       # Start Terminal Service
       {NoizuTeams.TerminalClient, url: "ws://127.0.0.1:6500/ws"},
+      # Redis
+      NoizuTeams.Redis,
+
       # Start the Endpoint (http/https)
       NoizuTeamsWeb.Endpoint
       # Start a worker by calling: NoizuTeams.Worker.start_link(arg)

@@ -1,6 +1,7 @@
 defmodule NoizuTeamsWeb.ChatLive do
   use NoizuTeamsWeb, :live_view
   require NoizuTeamsWeb.LiveMessage
+  alias Phoenix.LiveView.JS
   import NoizuLabs.EntityReference.Helpers
   require Logger
   def render(assigns) do
@@ -51,6 +52,7 @@ defmodule NoizuTeamsWeb.ChatLive do
               |> assign(:member, member)
 
     ~H"""
+    <div id={"msg-" <> @message.identifier}>
     <div :if={@member.identifier == @message.project_member_id}  class="flex flex-col space-y-1 mb-2">
                             <div class="bg-gray-200 dark:bg-blue-700  rounded-tl-lg rounded-tr-lg rounded-br-lg py-2 px-4">
                               <div class="markdown-body bg-inherit">
@@ -66,11 +68,23 @@ defmodule NoizuTeamsWeb.ChatLive do
                               <div class="markdown-body">
                                 <%= raw(Earmark.as_html!(@message.message)) %>
                               </div>
+                              <div class="hide-context" phx-click={%JS{} |> Phoenix.LiveView.JS.toggle(to: "#msg-" <> @message.identifier <> " .msg-llm-context")} :if={@message.llm_update}>
+<span class="justify-right">ℹ</span>
+
+                              <div class="msg-llm-context">
+                                <pre>
+      <%= @message.llm_update %>
+                                </pre>
+                              </div>
+
+                              </div>
+
                             </div>
                             <div class="text-gray-500 text-xs text-right">
                                 <%= @message.sender %>, <%= @message.created_on %>
                             </div>
                         </div>
+    </div>
     """
   end
 
@@ -81,6 +95,12 @@ defmodule NoizuTeamsWeb.ChatLive do
           NoizuTeamsWeb.LiveMessage.live_pub(subject: :channel, instance: previous.identifier, event: :message)
         )
         NoizuTeamsWeb.LiveMessage.unsubscribe(
+          NoizuTeamsWeb.LiveMessage.live_pub(subject: :channel, instance: previous.identifier, event: :stream)
+        )
+        NoizuTeamsWeb.LiveMessage.unsubscribe(
+          NoizuTeamsWeb.LiveMessage.live_pub(subject: :channel, instance: previous.identifier, event: :stream_end)
+        )
+        NoizuTeamsWeb.LiveMessage.unsubscribe(
           NoizuTeamsWeb.LiveMessage.live_pub(subject: :channel, instance: previous.identifier, event: :event)
         )
       end
@@ -88,6 +108,12 @@ defmodule NoizuTeamsWeb.ChatLive do
       Logger.error("SUBSCRIBE UPDATE")
       NoizuTeamsWeb.LiveMessage.subscribe(
         NoizuTeamsWeb.LiveMessage.live_pub(subject: :channel, instance: channel.identifier, event: :message)
+      )
+      NoizuTeamsWeb.LiveMessage.subscribe(
+        NoizuTeamsWeb.LiveMessage.live_pub(subject: :channel, instance: channel.identifier, event: :stream)
+      )
+      NoizuTeamsWeb.LiveMessage.subscribe(
+        NoizuTeamsWeb.LiveMessage.live_pub(subject: :channel, instance: channel.identifier, event: :stream_end)
       )
       NoizuTeamsWeb.LiveMessage.subscribe(
         NoizuTeamsWeb.LiveMessage.live_pub(subject: :channel, instance: channel.identifier, event: :event)
@@ -126,7 +152,71 @@ defmodule NoizuTeamsWeb.ChatLive do
         ),
         socket) do
 
-    messages = socket.assigns.messages ++ [payload.message]
+    messages = socket.assigns.messages
+    messages = cond do
+      index = payload.message.code && Enum.find_index(messages, &(&1.code == payload.message.code)) ->
+        #IO.puts "INSERT AT #{inspect index}"
+        put_in(messages, [Access.at(index)], payload.message)
+      :else ->
+        #IO.puts "APPEND NEW"
+        messages ++ [payload.message]
+    end
+
+    #IO.puts "REFRESH #{inspect messages}"
+
+    socket = socket
+             |> assign(
+                  messages: messages
+                )
+    {:noreply, socket}
+  end
+
+
+  def handle_info(
+        NoizuTeamsWeb.LiveMessage.live_pub(
+          subject: :channel,
+          event: :stream_end,
+          payload: payload
+        ),
+        socket) do
+
+    messages = socket.assigns.messages
+    messages = cond do
+      index = payload.message.code && Enum.find_index(messages, &(&1.code == payload.message.code)) ->
+        put_in(messages, [Access.at(index)], payload.message)
+      :else ->
+        messages ++ [payload.message]
+    end
+
+    #++ [payload.message]
+    socket = socket
+             |> assign(
+                  messages: messages
+                )
+    {:noreply, socket}
+  end
+
+  def handle_info(
+        NoizuTeamsWeb.LiveMessage.live_pub(
+          subject: :channel,
+          event: :stream,
+          payload: payload
+        ),
+        socket) do
+
+    messages = socket.assigns.messages
+    messages = cond do
+      index = payload.message.code && Enum.find_index(messages, &(&1.code == payload.message.code)) ->
+        #IO.puts "INSERT AT #{inspect index}"
+        put_in(messages, [Access.at(index)], payload.message)
+      :else ->
+        #IO.puts "APPEND NEW"
+        messages ++ [payload.message]
+    end
+
+    #IO.puts "REFRESH #{inspect messages}"
+
+    #++ [payload.message]
     socket = socket
              |> assign(
                   messages: messages
@@ -179,7 +269,7 @@ defmodule NoizuTeamsWeb.ChatLive do
   def handle_event("send", %{"message" => message}, socket) do
     sender = socket.assigns.user.member
              |> put_in([Access.key(:member)], %{socket.assigns.user| member: nil})
-    {:ok, audience} = NoizuTeamsService.Channel.send(socket.assigns.channel, sender,  socket.assigns.audience, message)
+    {:ok, audience} = NoizuTeamsService.Channel.send(socket.assigns.channel, sender, nil, socket.assigns.audience, message)
     socket = socket
              |> assign(audience: audience)
     {:noreply, socket}

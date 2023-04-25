@@ -35,9 +35,9 @@ defmodule NoizuTeams.Repo.Migrations.CreateProject do
       add :slug, :string, null: false
       add :description, :string, null: false
 
-      add :identity, :string, null: false
-      add :purpose, :string, null: false
-      add :self_image, :string, null: false
+      add :identity, :text, null: false
+      add :purpose, :text, null: false
+      add :self_image, :text, null: false
       add :mood, :string, null: false
 
 
@@ -133,6 +133,7 @@ defmodule NoizuTeams.Repo.Migrations.CreateProject do
       add :channel_id, :uuid, null: false
       add :project_member_id, :uuid, null: false
       add :message, :text, null: false
+      add :llm_update, :text, null: true
       add :created_on, :utc_datetime_usec, null: false
       add :modified_on, :utc_datetime_usec, null: false
       add :deleted_on, :utc_datetime_usec

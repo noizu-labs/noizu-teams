@@ -18,8 +18,8 @@ defmodule NoizuTeams.MixProject do
   # Type `mix help compile.app` for more information.
   def application do
     [
-      mod: {NoizuTeams.Application, [:db_connection, :noizu_labs_erp, :noizu_labs_open_ai ]},
-      extra_applications: [:logger, :runtime_tools,  :finch, :jason,]
+      mod: {NoizuTeams.Application, [:db_connection, :noizu_labs_erp, :noizu_labs_open_ai, :ecto]},
+      extra_applications: [:logger, :runtime_tools,  :finch, :jason, :fastglobal, :poison, :redix, :ecto]
     ]
   end
 
