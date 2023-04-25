@@ -21,6 +21,22 @@ defmodule NoizuTeams.Project do
     field :membership, :map, virtual: true
   end
 
+  def projects() do
+    query = from p in NoizuTeams.Project,
+            select: p
+    {:ok, NoizuTeams.Repo.all(query)}
+  end
+
+  def agents(project) do
+    query = from m in NoizuTeams.Project.Member,
+                 where: m.project_id == ^project.identifier,
+                 where: m.member_type == :agent,
+                 join: a in NoizuTeams.Project.Agent,
+                 on: a.identifier == m.member_id,
+                 select: %{m| member: a}
+    {:ok, NoizuTeams.Repo.all(query)}
+  end
+
   def members(project, user) do
     query = from m in NoizuTeams.Project.Member,
                  where: m.project_id == ^project.identifier,

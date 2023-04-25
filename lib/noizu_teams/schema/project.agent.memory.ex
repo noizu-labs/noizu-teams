@@ -19,8 +19,8 @@ defmodule NoizuTeams.Project.Agent.Memory do
   @doc false
   def changeset(team_agent, attrs) do
     team_agent
-    |> cast(attrs, [:agent_id, :title, :memory, :created_on, :modified_on, :deleted_on])
-    |> validate_required([:agent_id, :title, :memory, :created_on, :modified_on])
+    |> cast(attrs, [:agent_id, :subject, :topic, :memory, :created_on, :modified_on, :deleted_on])
+    |> validate_required([:agent_id, :subject, :topic, :memory, :created_on, :modified_on])
   end
 
 end

@@ -7,6 +7,11 @@ defmodule NoizuTeams.Application do
 
   @impl true
   def start(_type, _args) do
+    IO.puts """
+    -----------------------------------
+    START
+    -----------------------------------
+    """
     children = [
       # Start the Telemetry supervisor
       NoizuTeamsWeb.Telemetry,
@@ -22,7 +27,7 @@ defmodule NoizuTeams.Application do
       {NoizuTeams.TerminalClient, url: "ws://127.0.0.1:6500/ws"},
       # Redis
       NoizuTeams.Redis,
-
+      NoizuTeamsService.ProjectManager,
       # Start the Endpoint (http/https)
       NoizuTeamsWeb.Endpoint
       # Start a worker by calling: NoizuTeams.Worker.start_link(arg)

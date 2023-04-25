@@ -1,6 +1,34 @@
 defmodule NoizuTeamsService.Project do
   alias NoizuLabs.EntityReference.Protocol, as: ERP
   import Ecto.Query
+  require Logger
+  #-----------------------------------------------------------
+  use Supervisor
+
+  @doc """
+  Starts the ProjectSupervisor and its children.
+  """
+  def start_link(project) do
+    name = :"ProjectSupervisor.#{project.identifier}"
+    Supervisor.start_link(__MODULE__, project, name: name)
+  end
+
+  @impl true
+  def init(project) do
+    {:ok, agents} = NoizuTeams.Project.agents(project)
+    children = Enum.map(agents, fn agent ->
+      id = :"ProjectAgent.#{agent.identifier}"
+      %{
+        id: id,
+        start: {NoizuTeamsService.Agent, :start_link, [agent]}
+      }
+    end)
+    Supervisor.init(children, strategy: :one_for_one)
+  end
+
+  #-----------------------------------------------------------
+
+
 
   def channels(project, user, context) do
     with {:ok, project} <- ERP.entity(project, context),

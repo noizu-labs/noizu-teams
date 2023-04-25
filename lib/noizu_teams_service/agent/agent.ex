@@ -3,6 +3,393 @@ defmodule NoizuTeamsService.Agent do
   require Logger
   #import NoizuLabs.EntityReference.Helpers
   import Ecto.Query
+  require Record
+  use GenServer
+
+  #-------------------------------- RECORDS --------------------------------------
+  Record.defrecord(:chat_message, [sender: nil, record: nil, code: nil, channel: nil, time_stamp: nil, content: nil, reflection: nil])
+  Record.defrecord(:memory_entry, [identifier: nil, subject: nil, topic: nil, memory: nil, time_stamp: nil])
+  #-------------------------------- STATE ----------------------------------------
+
+  defstruct [
+    identifier: nil,
+    agent: nil,
+    chat_log: [],
+    chat_summary: %{},
+    memories: %{},
+  ]
+
+  @type t :: %__MODULE__{
+               identifier: any,
+               agent: any,
+               chat_log: any,
+               chat_summary: any,
+               memories: any,
+             }
+
+  #-------------------------------- GEN SERVER ----------------------------------------
+
+  @doc """
+  Starts the VirtualAgent GenServer process.
+  """
+  def start_link(agent, opts \\ []) do
+    GenServer.start_link(__MODULE__, agent, Keyword.put(opts, :name, worker_handle(agent)))
+  end
+
+  def worker_handle(agent) do
+    :"Agent_#{agent.identifier}"
+  end
+
+  @impl true
+  def init(agent) do
+    state = %__MODULE__{
+      identifier: agent.identifier,
+      agent: agent
+    }
+    {:ok, state}
+  end
+
+  @doc """
+  Retrieves the compressed chat history.
+  """
+  def chat_digest(agent_pid, recent_messages \\ []) do
+    GenServer.call(agent_pid, {:chat_digest, recent_messages})
+  end
+
+  # Callbacks
+
+
+
+  def chat(agent, message) do
+    GenServer.call(worker_handle(agent), {:handle_message, message})
+  end
+  def partial_reply(agent, message) do
+    GenServer.cast(worker_handle(agent), {:partial_reply, message})
+  end
+  def reflection_reply(agent, message) do
+    GenServer.cast(worker_handle(agent), {:reflection_reply, message})
+  end
+  def digest_update(agent, message) do
+    GenServer.cast(worker_handle(agent), {:digest_update, message})
+  end
+
+  @impl true
+  def handle_call({:handle_message, chat_message() = message}, _from, state) do
+    # Handle Inbound message.
+    Logger.error("TODO: INBOUND MESSAGE: #{inspect message}")
+
+    # 2. Query
+    code = {state.identifier, :os.system_time(:millisecond)}
+    off_thread_gpt(state, code, message)
+
+    state = state
+          |> update_in([Access.key(:chat_log)], &([message| (&1 || [])]))
+
+    # Your implementation here
+    {:reply, {:ok, code}, state}
+  end
+
+  def handle_cast({:partial_reply, chat_message() = message}, state) do
+    state = state
+            |> update_in([Access.key(:chat_log)], &([message| (&1 || [])]))
+    {:noreply, state}
+  end
+
+  def handle_cast({:reflection_reply, chat_message(code: code, record: record, channel: channel, reflection: reflection) = message}, state) do
+    # use state, update map of memory items -> do this on main thread. push response back to main thread.
+    if record do
+      NoizuTeamsService.Channel.add_msg_llm_update(code, channel, state.agent, record, reflection)
+    end
+    state = (cond do
+               index = code && Enum.find_index(state.chat_log, fn(entry) ->  chat_message(entry, :code) == code  end) ->
+                 put_in(state, [Access.key(:chat_log), Access.at(index)], message)
+               :else -> state
+             end)
+            |> reflection_updates(message)
+            |> refresh_digest()
+    {:noreply, state}
+  end
+
+  def handle_cast({:digest_update, chat_summary}, state) do
+    {:noreply, %{state| chat_summary: chat_summary}}
+  end
+
+  def refresh_digest(state) do
+    spawn fn ->
+      refresh_digest_off_thread(state)
+    end
+    state
+  end
+
+  def refresh_digest_off_thread(state) do
+    hack = DateTime.utc_now()
+    dp = digest_prompt(state.agent)
+    rh = with %{last_time_stamp: cut_off, chat_log: cl} <- state.chat_summary do
+      f = Enum.filter(state.chat_log, &( DateTime.compare( chat_message(&1, :time_stamp) , cut_off) != :lt))
+      (f || []) ++ (cl || [])
+    else
+      _ ->
+        state.chat_log
+    end |> Enum.reverse()
+
+
+    sender_lookup = Enum.map(rh, &chat_message(&1, :sender))
+                    |> Enum.uniq()
+                    |> Enum.filter(&(&1))
+    channel_lookup = Enum.map(rh, &chat_message(&1, :channel))
+                     |> Enum.uniq()
+                     |> Enum.filter(&(&1))
+    record_lookup = Enum.map(rh, &chat_message(&1, :record))
+                    |> Enum.uniq()
+                    |> Enum.filter(&(&1))
+
+    dp_len = Poison.encode!(%{role: "user", content: dp}) |> String.length()
+    p = Enum.map(rh,
+          fn(cm) ->
+            chat_message(sender: hs, record: hr, code: hc, channel: hcc, content: hcon, time_stamp: ts) = cm
+            #lc = hc && Tuple.to_list(hc)
+            #code: lc,
+            s_index = Enum.find_index(sender_lookup, fn(x) -> x.identifier == hs.identifier end)
+            r_index = hr && Enum.find_index(record_lookup, fn(x) -> x.identifier == hr.identifier end)
+            c_index = Enum.find_index(channel_lookup, fn(x) -> x.identifier == hcc.identifier end)
+            %{ts: ts, s: s_index, r:  r_index,  c: c_index, msg: hcon}
+          end)
+        |> Enum.reduce_while([], fn(x, acc) ->
+      u = acc ++ [x]
+      enc = Poison.encode!(u)
+      cond do
+        (String.length(enc) + dp_len) < 2000 -> {:cont, u}
+        :else -> {:halt, acc}
+      end
+    end)
+
+    payload = [
+      %{role: "user", content: dp},
+      %{role: "user", content: Poison.encode!(p)}
+    ] |> IO.inspect(label: "CHAT LOG TO DIGEST")
+
+    with {:ok, dd} <- NoizuLabs.OpenAI.chat(payload, temperature: 0.1) |> IO.inspect(label: "DIGEST RESPONSE"),
+         dm <- get_in(dd, [:choices, Access.at(0), :message, :content]),
+         {:ok, log} <- Poison.decode(dm),
+         true <- is_list(log) do
+      IO.inspect(log, label: "DIGEST JSON")
+      cf = Enum.map(log,
+             fn(x) ->
+               #code = x["code"]
+               #code = code && List.to_tuple(code)
+               cs_s = x["s"] && Enum.at(sender_lookup, x["s"])
+               cs_r = x["r"] && Enum.at(record_lookup, x["r"])
+               cs_c = x["c"] && Enum.at(channel_lookup, x["c"])
+
+               chat_message(sender: cs_s, record: cs_r, channel: cs_c, content: x["msg"], time_stamp: x["ts"])
+             end)
+      digest_update(state.agent, %{last_time_stamp: hack, chat_log: cf})
+      else
+      error ->
+      Logger.error("CHAT DIGEST ERROR: #{inspect error}")
+    end
+  end
+
+  def write_memory(state, memory_entry(identifier: nil, topic: topic, subject: subject, memory: memory, time_stamp: ts) = entry) do
+    Logger.error("WRITE MEMORY")
+    insert = %NoizuTeams.Project.Agent.Memory{
+      agent_id: state.agent.identifier,
+      subject: subject,
+      topic: topic,
+      memory: memory,
+      created_on: ts,
+      modified_on: ts
+    } |> NoizuTeams.Repo.insert() |> IO.inspect(label: "SAVED MEMORY")
+
+    with {:ok, record} <- insert do
+      memory_entry(entry, identifier: record.identifier)
+    else
+      _ ->
+        # Critical Error
+        entry
+    end
+  end
+
+  def write_memory(state, memory_entry(identifier: identifier, memory: memory, time_stamp: ts) = entry) do
+    Logger.error("UPDATE MEMORY")
+    existing = NoizuTeams.Repo.get(NoizuTeams.Project.Agent.Memory, identifier)
+    cs = NoizuTeams.Project.Agent.Memory.changeset(existing, %{memory: memory, modified_on: ts})
+    o = NoizuTeams.Repo.update(cs)
+        |> IO.inspect(label: "UPDATE MEMORY")
+    entry
+  end
+
+  def reflection_updates(state, chat_message(reflection: reflection) = message) do
+      with {:ok, yaml} <- extract_yaml(reflection) |> IO.inspect(label: "EXTRACTED YAML") do
+        now = DateTime.utc_now()
+        with [%{"patch" => context}] <- yaml do
+          memories = get_in(context, [Access.key("memory")])
+          if is_list(memories) and length(memories) > 0 do
+          Enum.reduce(memories, state, fn(memory, acc_state) ->
+              if memory["new_info"] do
+                subject = case memory["subject"] do
+                  "@self" -> "@self"
+                  "@" <> id -> id
+                  v -> v
+                end
+                topic = memory["topic"]
+                memory = memory["memory"]
+                cond do
+                  existing = state.memories[{subject, topic}] ->
+#   Record.defrecord(:memory_entry, [subject: nil, topic: nil, memory: nil, time_stamp: nil])
+                   cond do
+                   memory_entry(existing, :memory) == memory -> acc_state
+                   :else ->
+                     Logger.error("UPDATE MEMORY")
+                     update = write_memory(state, memory_entry(existing, memory: memory, time_stamp: DateTime.utc_now()))
+                              |> IO.inspect(label: "UPDATED MEMORY")
+                     put_in(acc_state, [Access.key(:memories), Access.key({subject, topic})], update)
+                     |> IO.inspect(label: "NEW STATE")
+                   end
+                  :else ->
+                    Logger.error("CREATE MEMORY")
+                    new_memory = write_memory(state, memory_entry(topic: topic, subject: subject, memory: memory, time_stamp: DateTime.utc_now()))
+                    |> IO.inspect(label: "NEW MEMORY")
+                    put_in(acc_state, [Access.key(:memories), Access.key({subject, topic})], new_memory)
+                    |> IO.inspect(label: "NEW STATE")
+                end
+              end
+            end)
+
+            else
+            state
+          end
+          else
+          error ->
+            Logger.error("MEMORY ERROR: #{inspect error}, #{inspect reflection}")
+          state
+        end
+      else
+        error ->
+          Logger.error("YAML ERROR: #{inspect error}, #{inspect reflection}")
+          state
+      end
+  end
+
+
+
+  def update_prompt(state, chat_message(code: code, content: content, sender: sender, record: record, channel: channel, reflection: reflection) = message) do
+    mp = master_prompt(state.agent, sender, content)
+
+    message_history = with %{last_time_stamp: cut_off, chat_log: cl} <- state.chat_summary do
+           Logger.error("STATE: CL #{inspect state.chat_summary}")
+            f = Enum.filter(state.chat_log, &( DateTime.compare( chat_message(&1, :time_stamp) , cut_off) != :lt))
+           (f || []) ++ (cl || [])
+         else
+           _ ->
+             state.chat_log
+         end
+
+    # TODO smart logic here - load chat digest
+    #message_history = ([message| (Enum.slice(state.chat_log, 0..5) || [])])
+    message_history = [message | message_history]
+                      |> IO.inspect(label: "MESSAGE HISTORY")
+                      |> Enum.map(
+                           fn(mm) ->
+                             Logger.error("SO FAR SO GODD")
+                             chat_message(sender: ms, content: mc, channel: mcc) = mm
+                             cond do
+                               ms.identifier == state.identifier ->
+                                 # Prune/tweak message in addition to chat_digest here.
+                                 # set to user to avoid confusing prompt.
+                                 %{role: "user", content: mc}
+                               :else ->
+                                 channel_name = cond do
+                                   mcc.channel_type == :direct -> "Direct"
+                                   :else -> mcc.slug
+                                 end
+                                 m = [
+                                   sender: [
+                                     channel: channel_name,
+                                     name: ms.member.name,
+                                     id: ms.identifier,
+                                     message: mc,
+                                   ]
+                                 ]
+                                 %{role: "user", content: "#{:fast_yaml.encode(m)}"}
+                             end
+                           end)
+                      |> Enum.reverse()
+    [
+      %{role: "user", content: mp},
+      #      %{role: "user", content: "#{:fast_yaml.encode(m)}"}
+    ] ++ message_history
+  end
+
+  def off_thread_gpt(this, msg_code,  chat_message(sender: sender, channel: channel, time_stamp: time_stamp, content: content, reflection: reflection) = message) do
+    messages = update_prompt(this, message)
+    |> IO.inspect(label: "MESSAGE QUEUE", limit: :infinity)
+    emit_agent_typing_event(this.agent, channel, true)
+    spawn fn ->
+      code = {channel, this.agent, msg_code}
+      with {:ok, response} <- NoizuLabs.OpenAI.chat(messages, temperature: 1.0, stream: {code, &__MODULE__.stream/2}) do
+        # push update message to self.
+
+        with %{message: response, record: record, status: 200} <- response do
+            partial = chat_message(message, record: record, code: msg_code, sender: this.agent, time_stamp: DateTime.utc_now(), content: response, reflection: nil)
+            partial_reply(this.agent, partial)
+            # push back to self.
+
+            #--- soon to be removed
+            channel_name = cond do
+              channel.channel_type == :direct -> "Direct"
+              :else -> channel.slug
+            end
+            new_entry = %{role: "assistant", content: response}
+            add_hack_history(this.agent, new_entry)
+            #---- REFLECTION -----------
+
+            mm = prepare_meta_prompt(this.agent, channel, sender, content, response)
+            with {:ok, mr} <- NoizuLabs.OpenAI.chat(mm, temperature: 0.1) do
+              meta_response = get_in(mr, [:choices, Access.at(0), :message, :content])
+              with_reflection = chat_message(partial, reflection: meta_response)
+              emit_agent_typing_event(this.agent, channel, false)
+              reflection_reply(this.agent, with_reflection)
+            end
+        end
+      end
+    end
+  end
+
+  @impl true
+  def handle_call({:chat_digest, recent_messages}, _from, state) do
+    # Your implementation here
+    {:reply, [], state}
+  end
+
+  #--------------------------------------------------
+  #
+  #--------------------------------------------------
+  def emit_agent_typing_event(agent, channel, typing) do
+    # 1. Emit typing event
+    typing_event = %{
+      event: :typing,
+      member: agent,
+      status: %{
+        typing: typing,
+        updated_on: DateTime.utc_now(),
+        member: agent
+      }
+    }
+    NoizuTeamsWeb.LiveMessage.publish(
+      NoizuTeamsWeb.LiveMessage.live_pub(subject: :channel, instance: channel.identifier, event: :event, payload: typing_event)
+    )
+  end
+
+
+
+
+
+
+
+
+
+
 
   def opinions(_) do
     {:ok, []}
@@ -15,9 +402,11 @@ defmodule NoizuTeamsService.Agent do
   end
   def memory(:short_term, agent, sender) do
     # this should be more precise, and filtered.
+    cut_off = Timex.shift(DateTime.utc_now(), hours: -1)
     query = from m in NoizuTeams.Project.Agent.Memory,
            where: m.agent_id == ^agent.member.identifier,
            where: m.subject in ["@self", ^sender.identifier ],
+           where: m.modified_on >=^cut_off,
            select: m
     r = NoizuTeams.Repo.all(query)
         |> Enum.map(fn(memory) ->
@@ -47,6 +436,16 @@ defmodule NoizuTeamsService.Agent do
     {:ok, members}
   end
 
+
+  def digest_prompt(_) do
+    """
+    MASTER PROMPT
+    ======================
+    You are an internal tool whose job is to digest the following array of chat entries. Group by channel (c field) and compact multiple entries into fewer entries.
+    Remove redundant/unnecessary/duplicate content (per channel). Return a json response (with no commentary) of the updated chat log array. If you see back and forth communication to get
+    to a final output you may cut out the inbetween statements and revise the initial request with all details and then insert the final/improved response.
+    """
+  end
 
   def meta_prompt(agent, _) do
   """
@@ -259,6 +658,9 @@ defmodule NoizuTeamsService.Agent do
   end
 
 
+
+
+
   def prepare_meta_prompt(agent, channel, sender, message, response) do
     mp = meta_prompt(agent, sender)
     context = ["current-context": agent_context(agent, sender)]
@@ -273,7 +675,7 @@ defmodule NoizuTeamsService.Agent do
         channel: channel_name,
         message: message
       ]
-    ]
+    ] |> IO.inspect(label: ">>>>>>>>>>>>>>>>>>>>>>>>> sm")
     ar = [
       agent: [
         name: agent.member.name,
@@ -471,84 +873,74 @@ defmodule NoizuTeamsService.Agent do
   end
 
   def message(agent, channel, sender, message) do
-     spawn fn ->
-        messages = prepare_prompt(agent, channel, sender, message)
-        #project = NoizuTeams.Project.entity(channel.project_id) |> ok?()
-
-        # 1. Emit typing event
-        typing_event = %{
-          event: :typing,
-          member: agent,
-          status: %{
-            typing: true,
-            updated_on: DateTime.utc_now(),
-            member: agent
-          }
-        }
-        NoizuTeamsWeb.LiveMessage.publish(
-          NoizuTeamsWeb.LiveMessage.live_pub(subject: :channel, instance: channel.identifier, event: :event, payload: typing_event)
-        )
-
-        # 2. Query
-        id_code = {agent.identifier, :os.system_time(:millisecond)}
-        code = {channel, agent, id_code}
-        with {:ok, response} <- NoizuLabs.OpenAI.chat(messages, temperature: 1.0, stream: {code, &__MODULE__.stream/2}) do
-
-          # 3. End Typing
-          typing_event = %{
-            event: :typing,
-            member: agent,
-            status: %{
-              typing: false,
-              updated_on: DateTime.utc_now(),
-              member: agent
-            }
-          }
-          NoizuTeamsWeb.LiveMessage.publish(
-            NoizuTeamsWeb.LiveMessage.live_pub(subject: :channel, instance: channel.identifier, event: :event, payload: typing_event)
-          )
-
-          {code, record, response} = case response do
-            %{message: x, code: {_,_,code}} -> {code, response[:record], x}
-            :else -> {nil, nil, get_in(response, [:choices, Access.at(0), :message, :content])}
-          end
-
-
-          channel_name = cond do
-            channel.channel_type == :direct -> "Direct"
-            :else -> channel.slug
-          end
-#          new_entry = [
-#            sender: [
-#              channel: channel_name,
-#              name: agent.member.name,
-#              id: agent.identifier,
-#              message: response,
-#              ts: :os.system_time(:second)
-#            ]
-#          ]
-          new_entry = %{role: "assistant", content: response}
-          add_hack_history(agent, new_entry)
-
-
-
-          mm = prepare_meta_prompt(agent, channel, sender, message, response)
-          with {:ok, mr} <- NoizuLabs.OpenAI.chat(mm, temperature: 0.1) do
-            meta_response = get_in(mr, [:choices, Access.at(0), :message, :content])
-            mrc = [context: agent_context(agent, sender)]
-            extract_meta(agent, meta_response)
-
-            if record do
-              NoizuTeamsService.Channel.add_msg_llm_update(code, channel, agent, record, meta_response)
-            else
-              NoizuTeamsService.Channel.send(channel, agent, code, [], {response, "\n------------------\n````yaml\n" <> meta_response <> "\n\n````"})
-            end
-
-
-          end
-
-
-        end
-      end
+     __MODULE__.chat(agent, chat_message(sender: sender, channel: channel, time_stamp: DateTime.utc_now(), content: message))
+#     spawn fn ->
+#        messages = prepare_prompt(agent, channel, sender, message)
+#        #project = NoizuTeams.Project.entity(channel.project_id) |> ok?()
+#
+#        # 1. Emit typing event
+#        typing_event = %{
+#          event: :typing,
+#          member: agent,
+#          status: %{
+#            typing: true,
+#            updated_on: DateTime.utc_now(),
+#            member: agent
+#          }
+#        }
+#        NoizuTeamsWeb.LiveMessage.publish(
+#          NoizuTeamsWeb.LiveMessage.live_pub(subject: :channel, instance: channel.identifier, event: :event, payload: typing_event)
+#        )
+#
+#        # 2. Query
+#        id_code = {agent.identifier, :os.system_time(:millisecond)}
+#        code = {channel, agent, id_code}
+#        with {:ok, response} <- NoizuLabs.OpenAI.chat(messages, temperature: 1.0, stream: {code, &__MODULE__.stream/2}) do
+#
+#          # 3. End Typing
+#          typing_event = %{
+#            event: :typing,
+#            member: agent,
+#            status: %{
+#              typing: false,
+#              updated_on: DateTime.utc_now(),
+#              member: agent
+#            }
+#          }
+#          NoizuTeamsWeb.LiveMessage.publish(
+#            NoizuTeamsWeb.LiveMessage.live_pub(subject: :channel, instance: channel.identifier, event: :event, payload: typing_event)
+#          )
+#
+#          {code, record, response} = case response do
+#            %{message: x, code: {_,_,code}} -> {code, response[:record], x}
+#            :else -> {nil, nil, get_in(response, [:choices, Access.at(0), :message, :content])}
+#          end
+#
+#
+#          channel_name = cond do
+#            channel.channel_type == :direct -> "Direct"
+#            :else -> channel.slug
+#          end
+#          new_entry = %{role: "assistant", content: response}
+#          add_hack_history(agent, new_entry)
+#
+#          mm = prepare_meta_prompt(agent, channel, sender, message, response)
+#          with {:ok, mr} <- NoizuLabs.OpenAI.chat(mm, temperature: 0.1) do
+#            meta_response = get_in(mr, [:choices, Access.at(0), :message, :content])
+#            mrc = [context: agent_context(agent, sender)]
+#            extract_meta(agent, meta_response)
+#
+#            if record do
+#              NoizuTeamsService.Channel.add_msg_llm_update(code, channel, agent, record, meta_response)
+#            else
+#              NoizuTeamsService.Channel.send(channel, agent, code, [], {response, "\n------------------\n````yaml\n" <> meta_response <> "\n\n````"})
+#            end
+#
+#
+#          end
+#
+#
+#        end
+#      end
   end
 end

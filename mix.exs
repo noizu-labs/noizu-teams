@@ -18,9 +18,12 @@ defmodule NoizuTeams.MixProject do
   # Type `mix help compile.app` for more information.
   def application do
     [
-      mod: {NoizuTeams.Application, [:db_connection, :noizu_labs_erp, :noizu_labs_open_ai, :ecto]},
-      extra_applications: [:logger, :runtime_tools,  :finch, :jason, :fastglobal, :poison, :redix, :ecto]
-    ]
+      mod: {
+        NoizuTeams.Application,
+        [
+        ]
+      }
+    ] |> IO.inspect(label: "Applications")
   end
 
   # Specifies which paths to compile per environment.
@@ -35,7 +38,8 @@ defmodule NoizuTeams.MixProject do
       {:phoenix, "~> 1.7.2"},
       {:phoenix_ecto, "~> 4.4"},
       {:ecto_sql, "~> 3.6"},
-      {:postgrex, ">= 0.0.0"},
+      {:ecto, "~> 3.9.5"},
+      {:postgrex, "~> 0.16.5"},
       {:phoenix_html, "~> 3.3"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:phoenix_live_view, "~> 0.18.16"},
@@ -59,6 +63,7 @@ defmodule NoizuTeams.MixProject do
       {:guardian, "~> 2.3.1"},
       {:poison, "~> 3.1.0"},
       {:redix, "~> 1.1"},
+      {:timex, "~> 3.7.9"},
       {:noizu_labs_erp, path: "elixir-framework/apps/noizu_labs_erp"},
       {:noizu_labs_open_ai, path: "elixir-framework/apps/noizu_labs_open_ai"},
       {:fast_yaml, "~> 1.0.36"},
