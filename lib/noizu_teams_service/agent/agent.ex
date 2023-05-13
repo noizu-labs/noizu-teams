@@ -576,11 +576,9 @@ defmodule NoizuTeamsService.Agent do
     <llm-fim>
       <llm-fim-title><h2><text of prompt></h2></llm-fim-title>
       <llm-fim-media type="<format>">
-      <samp>
       <svg width="100" height="100" style="border:1px solid black;">
         <circle cx="50" cy="50" r="30" fill="blue" />
       </svg>
-      </samp>
       </llm-fim-media>
     </llm-fim>
 
@@ -595,7 +593,7 @@ defmodule NoizuTeamsService.Agent do
   def extensions(:git, message) do
 
     tool = """
-      ## service chat-git
+      ## service gpt-git
       You will also simulate a virtual git repo called chat-git.
       In addition to standard git commands it supports extensions for
       - switching between repos `chat-git repo #\{repo-name}`
@@ -607,7 +605,7 @@ defmodule NoizuTeamsService.Agent do
       The linux command line is referenced using `!` e.g. `! tree` will output the file tree of the current git repo.  `! locate *.md` will locate all files in the repo ending in `.md`
 
     """
-    if message =~ "chat-git" do
+    if message =~ "gpt-git" || message =~ "git" do
       tool
     else
       ""
@@ -696,7 +694,7 @@ defmodule NoizuTeamsService.Agent do
 
   def hack_history_key(agent) do
     # Temp hack to avoid spinning up genservers.
-    "cl:cb-11:" <> agent.identifier
+    "cl:cb-12:" <> agent.identifier
   end
 
   def add_hack_history(agent, msg) do

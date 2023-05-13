@@ -21,7 +21,7 @@ config :noizu_teams,
 
 # Configures the endpoint
 config :noizu_teams, NoizuTeamsWeb.Endpoint,
-  url: [host: "localhost"],
+  url: [host: "0.0.0.0"],
   render_errors: [
     formats: [html: NoizuTeamsWeb.ErrorHTML, json: NoizuTeamsWeb.ErrorJSON],
     layout: false

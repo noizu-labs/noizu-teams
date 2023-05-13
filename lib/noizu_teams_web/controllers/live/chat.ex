@@ -105,7 +105,6 @@ defmodule NoizuTeamsWeb.ChatLive do
         )
       end
 
-      Logger.error("SUBSCRIBE UPDATE")
       NoizuTeamsWeb.LiveMessage.subscribe(
         NoizuTeamsWeb.LiveMessage.live_pub(subject: :channel, instance: channel.identifier, event: :message)
       )
